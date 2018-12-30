@@ -49,23 +49,19 @@ function setStatus(id, newStatus, callback) {
 
     if (doc.status == states.DELETED) {
       callback(new WrongStatusError('A deleted user can not change status'), null)
+      return
+    }
+
+    if (newStatus == status.WAITING) {
+      callback(new WrongStatusError ('A user can not go back to waiting status'), null)
+      return
     }
     
-    if (doc.status == states.WAITING && newStatus == states.DEACTIVATED) {
+    if (doc.status == states.WAITING && newStatus != states.ACTIVE) {
       callback(new WrongStatusError ('You can not deactivate a user who is not active'), null)
       return 
     }
     
-    if (doc.status == states.ACTIVE && newStatus == states.WAITING) {
-      callback(new WrongStatusError('You can only deactivate or delete an active user'), null)
-      return
-    }
-
-    if (doc.status == states.DEACTIVATED && newStatus != states.ACTIVE) {
-      callback(new WrongStatusError('A deactivated user can only go back to active status'), null)
-      return 
-    }
-
     User.updateOne(doc, {'status': newStatus}, (err, doc) => {
       callback(err, doc)
     })
