@@ -25,14 +25,12 @@ export class RegisterComponent implements OnInit {
   }
 
   userForm = new FormGroup({
-    fullname: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email]),
+    pseudo: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
     repeatPassword: new FormControl('', [Validators.required, this.passwordsMatchValidator])
   })
 
-  get fullname(): any { return this.userForm.get('fullname'); }
-  get email(): any { return this.userForm.get('email'); }
+  get pseudo(): any { return this.userForm.get('pseudo'); }
   get password(): any { return this.userForm.get('password'); }
   get repeatPassword(): any { return this.userForm.get('repeatPassword'); }
 
@@ -41,13 +39,12 @@ export class RegisterComponent implements OnInit {
     if(!this.userForm.valid) return;
 
     let {
-      fullname,
-      email,
+      pseudo,
       password,
       repeatPassword
     } = this.userForm.getRawValue();
 
-    this.authService.register(fullname, email, password, repeatPassword)
+    this.authService.register(pseudo, password, repeatPassword)
     .subscribe(data => {
       this.router.navigate(['']);
     })
