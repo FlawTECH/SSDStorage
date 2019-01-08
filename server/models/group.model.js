@@ -1,15 +1,10 @@
 const mongoose = require('mongoose');
 
 const GroupSchema = new mongoose.Schema({
-  fileId: {
-    type: String,
-    required: true
-  },
-  userId: {
+  name: {
     type: String,
     required: true
   }
 });
 
-
-module.exports = mongoose.model('File', GroupSchema);
+module.exports = mongoose.model('Group', GroupSchema);

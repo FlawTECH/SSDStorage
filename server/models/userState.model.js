@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const UserStatesSchema = new mongoose.Schema({
+const UserStateSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -8,5 +8,4 @@ const UserStatesSchema = new mongoose.Schema({
   }
 });
 
-
-module.exports = mongoose.model('File', UserStatesSchema);
+module.exports = mongoose.model('UserState', UserStateSchema);

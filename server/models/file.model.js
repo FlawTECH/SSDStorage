@@ -14,18 +14,11 @@ const FileSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  ownerId: {
-    type: String,
-  },
   createdAt: {
     type: Date,
     default: Date.now,
     required: true
-  }, 
-  groupId: {
-    type: String,
   }
 });
-
 
 module.exports = mongoose.model('File', FileSchema);

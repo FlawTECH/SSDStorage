@@ -10,18 +10,22 @@ const FilePermissionsSchema = new mongoose.Schema({
     required: true
   },
   read: {
-    type: boolean,
+    type: Boolean,
     required: true
   },
   write: {
-    type: boolean,
+    type: Boolean,
     required: true
   },
   delete: {
-    type: boolean,
+    type: Boolean,
+    required: true
+  },
+  isOwner: {
+    type: Boolean,
     required: true
   }
 });
 
 
-module.exports = mongoose.model('File', FilePermissionsSchema);
+module.exports = mongoose.model('FilePermissions', FilePermissionsSchema);
