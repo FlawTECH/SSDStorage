@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  stateId: {
+    type: String,
+    required: true
+  },
   roles: [{
     type: String,
   }]

@@ -10,7 +10,6 @@ const userSchema = Joi.object({
   repeatPassword: Joi.string().required().valid(Joi.ref('password'))
 })
 
-
 module.exports = {
   insert
 }
