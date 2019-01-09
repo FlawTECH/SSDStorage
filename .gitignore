@@ -45,3 +45,6 @@ Thumbs.db
 
 # Env file
 *.env
+
+# Upload directory
+/server/userDirectory/*
