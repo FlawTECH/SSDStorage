@@ -1,8 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
-const fileCtrl = require('../controllers/file.controller');
-
+const groupCtl = require('../controllers/group.controller');
 
 const router = express.Router();
 module.exports = router;
@@ -14,7 +13,7 @@ router.route('/')
 
 
 async function insert(req, res) {
-  let file = await fileCtrl.insert(req.body);
-  file = file.toObject();
-  res.json(file);
+  let group = await groupCtl.insert(req.body);
+  group = group.toObject();
+  res.json(group);
 }
