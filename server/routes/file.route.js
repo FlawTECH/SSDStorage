@@ -13,33 +13,29 @@ module.exports = router;
 router.route('/')
   .post(asyncHandler(insert));
 
-
 async function insert(req, res) {
   
-  if (Object.keys(req.files).length == 0) {
-    return res.status(400).send('No files were uploaded.');
-  }
+ var form = new formidable.IncomingForm();
 
-  // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-  let fileToUpload = req.files.fileToUpload;
-  let path = '/../userDirectory/'+req.files.fileToUpload.name
-  // Use the mv() method to place the file somewhere on your server
-  fileToUpload.mv(path, function(err) {
-    if (err)
-      return res.status(500).send(err);
+  form.parse(req);
 
-    res.send('File uploaded!');
+  form.on('fileBegin', function (name, file){
+      file.path = __dirname + '/../userDirectory/' + file.name;
+      
   });
 
-
-  var filet = {
-    name: req.files.fileToUpload.name,
-    path: path
-  };
   
-  let file = await fileCtrl.insert(filet);
-  
-  file = file.toObject();
+  form.on('file', async function (name, file){
+    let fileToUpload;
+    fileToUpload = {
+        'name': file.name,
+        'path': file.path,
+        'type': 'f'
+      };
+      console.log('Uploaded ' + file.name + ' to ' + file.path);
 
-  res.json(file);
+      fileToUpload = await fileCtrl.insert(fileToUpload);
+      fileToUpload = fileToUpload.toObject();
+      res.json(file);
+  });
 }

@@ -1,23 +1,21 @@
 const Joi = require('joi');
 const File = require('../models/file.model');
-const fileUpload = require('express-fileupload');
+
 
 const FileSchema = Joi.object({
-  // name: Joi.string().required(),
- // path: Joi.string().required()
+  name: Joi.string().required(),
+  path: Joi.string().required(),
+  type: Joi.string().required()
 })
 
 module.exports = {
   insert
 }
 
-async function insert(req) {
-  
-  
+async function insert(file) {
 
- 
-
-  file = await Joi.validate(req, FileSchema, { abortEarly: false });
+  console.log('File: ' +file.name+", path:"+file.path);
+  file = await Joi.validate(file, FileSchema, { abortEarly: false });
   
   return await new File(file).save();
 }
