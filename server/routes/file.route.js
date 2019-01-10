@@ -13,61 +13,87 @@ const Filedb = require("../models/file.model");
 
 module.exports = router;
 
-router.use(passport.authenticate('jwt', { session: false }))
+router.use(passport.authenticate('jwt', {
+  session: false
+}))
 
 router.route('/')
   .post(asyncHandler(insert));
+router.route('/')
+  .get(asyncHandler(getFileListByUserId));
 
 async function insert(req, res) {
-  
+
   var form = new formidable.IncomingForm();
-  
-  
+
+
 
   form.parse(req);
 
-  form.on('fileBegin', function (name, file){
-      file.path = __dirname + '/../userDirectory/' + file.name;
-      
+  form.on('fileBegin', function (name, file) {
+    file.path = __dirname + '/../userDirectory/' + file.name;
+
   });
 
-  
-  form.on('file', async function (name, file){
+
+  form.on('file', async function (name, file) {
     let fileToUpload;
     fileToUpload = {
-        'name': file.name,
-        'path': file.path,
-        'type': 'f'
-      };
-      console.log('Uploaded ' + file.name + ' to ' + file.path);
+      'name': file.name,
+      'path': file.path,
+      'type': 'f'
+    };
+    console.log('Uploaded ' + file.name + ' to ' + file.path);
 
-      fileToUpload = await fileCtrl.insert(fileToUpload);
+    fileToUpload = await fileCtrl.insert(fileToUpload);
 
-      var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
-
-      
-      fileToUpload = fileToUpload.toObject();
+    var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
 
 
-      var fileId,userId;
+    fileToUpload = fileToUpload.toObject();
 
-      await Filedb.findOne({name:fileToUpload.name},(err,res)=>{
-        fileId = res._id;
-      });
-      await User.findOne({name: decoded.name},(err,res)=>{
-        userId = res._id;
-      });
 
-      permissionToCreate = {
-        'fileId': fileId,
-        'userId': userId,
-        'read': true,
-        'write': true,
-        'delete': true,
-        'isOwner':true,
-      };
-      permissionToCreate = await persmissionCtrl.insert(permissionToCreate);
-      
-      res.json(file+persmissionCtrl);
+    var fileId, userId;
+
+    await Filedb.findOne({
+      name: fileToUpload.name
+    }, (err, res) => {
+      fileId = res._id;
+    });
+    await User.findOne({
+      name: decoded.name
+    }, (err, res) => {
+      userId = res._id;
+    });
+
+    permissionToCreate = {
+      'fileId': fileId,
+      'userId': userId,
+      'read': true,
+      'write': true,
+      'delete': true,
+      'isOwner': true,
+    };
+    permissionToCreate = await persmissionCtrl.insert(permissionToCreate);
+
+    res.json(file + persmissionCtrl);
+  });
+}
+
+async function getFileListByUserId(req, res) {
+
+  var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
+
+  
+  
+
+  Filedb.collection.find({
+    userId: User.findOne({
+      name: decoded.name
+    })._id
+  }).toArray(function (error, documents) {
+    if (error) throw error;
+
+    res.send(documents);
   });
 }
