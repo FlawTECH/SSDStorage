@@ -1,0 +1,31 @@
+.example-container {
+    min-height: 100vh;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+  }
+  
+  .example-sidenav-content {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .example-sidenav {
+    padding: 20px;
+  }
+  
+  .primary {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 30px;
+  }
+  
+  .spacer-toolbar {
+    flex: 1 1 auto;
+  }
+  
+  ² .icon-toolbar {
+    padding: 0 14px;
+  }
+  

@@ -19,6 +19,7 @@ async function insert(user) {
   delete user.password;
   await UserState.findOne({name: 'DISABLED'}, async function(err, res) {
     user.stateId = res._id;
+    console.log(res);
     // dbUser.stateId.push(res);
   });
   return await new User(user).save();
