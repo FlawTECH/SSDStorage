@@ -2,11 +2,12 @@ const Joi = require('joi');
 const FilePermissions = require('../models/filePermissions.model');
 
 const FilePermissionsSchema = Joi.object({
-  fileId: Joi.string().required(),
-  userId: Joi.string().required(),
+  fileId: Joi.any().required(),
+  userId: Joi.any().required(),
   read: Joi.boolean().required(),
   write: Joi.boolean().required(),
-  delete: Joi.boolean().required()
+  delete: Joi.boolean().required(),
+  isOwner: Joi.any()
 })
 
 module.exports = {
