@@ -3,10 +3,12 @@ const mongoose = require('mongoose');
 const FilePermissionsSchema = new mongoose.Schema({
   fileId: {
     type: mongoose.SchemaTypes.ObjectId,
+    ref: 'File',
     required: true
   },
   userId: {
     type: mongoose.SchemaTypes.ObjectId,
+    ref: 'User',
     required: true
   },
   read: {
