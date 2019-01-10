@@ -13,10 +13,10 @@ export class AuthService {
 
   public $userSource = new Subject<any>();
 
-  login(email : string, password : string) : Observable <any> {
+  login(fullname : string, password : string) : Observable <any> {
     return Observable.create(observer => {
       this.http.post('/api/auth/login', {
-        email,
+        fullname,
         password
       }).subscribe((data : any) => {
           observer.next({user: data.user});
@@ -27,11 +27,10 @@ export class AuthService {
     });
   }
 
-  register(fullname : string, email : string, password : string, repeatPassword : string) : Observable <any> {
+  register(fullname : string,  password : string, repeatPassword : string) : Observable <any> {
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
         fullname,
-        email,
         password,
         repeatPassword
       }).subscribe((data : any) => {
@@ -44,7 +43,12 @@ export class AuthService {
   }
 
   setUser(user): void {
-    if (user) user.isAdmin = (user.roles.indexOf('admin') > -1);
+    if (user){
+      //user.isAdmin = (user.roles.indexOf('admin') > -1);
+      user.isAdmin = (user.isAdmin == false);
+
+    }
+    
     this.$userSource.next(user);
     (<any>window).user = user;
   }
