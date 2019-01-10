@@ -5,56 +5,56 @@ export class File {
     private _type: string;
     private _createdAt: Date;
 
-    constructor(name:string, path: string, type: string, createdAt?: Date) {
+    constructor(name?:string, path?: string, type?: string, createdAt?: Date) {
         this._name = name;
         this._path = path;
         this._type = type;
         this._createdAt = createdAt;
     }
 
-    get id(): string {
+    public get id(): string {
         return this._id;
     }
 
-    get name(): string {
+    public get name(): string {
         return this._name;
     }
 
-    get path(): string {
+    public get path(): string {
         return this._path;
     }
 
-    get type(): string {
+    public get type(): string {
         return this._type;
     }
 
-    get createdAt(): Date {
+    public get createdAt(): Date {
         return this._createdAt;
     }
 
-    set id(value:string) {
+    public set id(value:string) {
         this._id = value;
     }
 
-    set name(value:string) {
+    public set name(value:string) {
         this._name = value;
     }
 
-    set path(value:string) {
+    public set path(value:string) {
         this._path = value;
     }
 
-    set type(value:string) {
+    public set type(value:string) {
         this._type = value;
     }
 
-    set createdAt(value:Date) {
+    public set createdAt(value:Date) {
         this._createdAt = value;
     }
 
     public static fromJSON(rawFile : any) : File {
         const tmpFile = new File(rawFile['name'], rawFile['path'], rawFile['type'], rawFile['createdAt']);
-        tmpFile.id = rawFile['id'];
+        tmpFile.id = rawFile['_id'];
         return tmpFile;
     }
 
@@ -64,7 +64,7 @@ export class File {
 
     public getCleanDataForSending() {
         return {
-            "id" : this._id,
+            "_id" : this._id,
             "name": this._name,
             "path" : this._path,
             "type": this._type,
