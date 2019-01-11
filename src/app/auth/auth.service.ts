@@ -27,13 +27,11 @@ export class AuthService {
     });
   }
 
-  register(fullname : string,  password : string, repeatPassword : string, status: string = "Waiting") : Observable <any> {
+  register(fullname : string,  password : string, repeatPassword : string) : Observable <any> {
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
         fullname,
         password,
-        status,
-        // roles, //TODO aled tanguy 
         repeatPassword
       }).subscribe((data : any) => {
         observer.next({user: data.user});
