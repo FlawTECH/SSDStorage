@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 const WrongStatusError = require('../errors').WrongStatusError
 
 const userSchema = Joi.object({
-  pseudo: Joi.string().required(),
+  fullname: Joi.string().required(),
   status: Joi.string().required().regex(/^Waiting$|^Active$|^Deleted$|^Deactivated$/),
   password: Joi.string().required(),
   repeatPassword: Joi.string().required().valid(Joi.ref('password')),

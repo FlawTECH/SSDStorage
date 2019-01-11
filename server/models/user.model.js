@@ -19,9 +19,16 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  roles: [{
+  stateId: {
     type: String,
-  }]
+    required: true,
+    default: "0"
+  },
+  isAdmin: {
+    type: Boolean,
+    required: true,
+    default: false
+  }
 }, {
   versionKey: false
 });
