@@ -82,10 +82,10 @@ async function getFileListByUserId(req, res) {
     userId: User.findOne({
       name: decoded.name
     })._id
-  }).toArray(function (error, documents) {
+  }).toArray( (error, documents) => {
     if (error) throw error;
 
     res.send(documents);
-    console.log(documents[1].name);
+    
   });
 }
