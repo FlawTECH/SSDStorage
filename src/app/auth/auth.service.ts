@@ -33,7 +33,7 @@ export class AuthService {
         fullname,
         password,
         status,
-        roles,
+        // roles, //TODO aled tanguy 
         repeatPassword
       }).subscribe((data : any) => {
         observer.next({user: data.user});
