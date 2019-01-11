@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 const UserGroupSchema = new mongoose.Schema({
   groupId: {
-    type: String,
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Group',
     required: true
   },
   userId: {
-    type: String,
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'User',
     required: true
   }
 });

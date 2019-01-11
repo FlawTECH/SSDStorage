@@ -1,0 +1,12 @@
+<div class="transitionFade">
+  <div class="nav-bar">
+    <nav mat-tab-nav-bar aria-label="management">
+      <a mat-tab-link *ngFor="let tab of tabs" [routerLink]="[tab.path]" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+        {{tab.label}}
+      </a>
+    </nav>
+  </div>
+
+
+  <router-outlet></router-outlet>
+</div>

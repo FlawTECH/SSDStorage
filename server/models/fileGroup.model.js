@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 const FileGroupSchema = new mongoose.Schema({
   groupId: {
-    type: String,
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Group',
     required: true
   },
   fileId: {
-    type: String,
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'File',
     required: true
   }
 });

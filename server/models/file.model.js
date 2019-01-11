@@ -4,7 +4,7 @@ const FileSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    match: ['/([a-zA-Z0-9\s_\\.\-\(\):])+$/', 'File name invalid.']
+    match: [/([a-zA-Z0-9\s_\\.\-\(\):])+$/, 'File name invalid.']
   },
   path: {
     type: String,
@@ -17,7 +17,7 @@ const FileSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    required: true
+   required: true
   }
 });
 

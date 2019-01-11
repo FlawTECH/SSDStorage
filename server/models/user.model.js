@@ -20,9 +20,9 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   },
   stateId: {
-    type: String,
-    required: true,
-    default: "0"
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'UserState',
+    required: true
   },
   isAdmin: {
     type: Boolean,

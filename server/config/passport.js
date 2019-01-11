@@ -8,9 +8,9 @@ const User = require('../models/user.model');
 const config = require('./config');
 
 const localLogin = new LocalStrategy({
-  usernameField: 'pseudo'
-}, async (pseudo, password, done) => {
-  let user = await User.findOne({ pseudo });
+  usernameField: 'fullname'
+}, async (fullname, password, done) => {
+  let user = await User.findOne({ fullname });
   if (!user || !bcrypt.compareSync(password, user.hashedPassword)) {
     return done(null, false, { error: 'Your login details could not be verified. Please try again.' });
   }

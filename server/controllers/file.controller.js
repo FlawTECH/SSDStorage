@@ -1,9 +1,11 @@
 const Joi = require('joi');
 const File = require('../models/file.model');
 
+
 const FileSchema = Joi.object({
   name: Joi.string().required(),
-  path: Joi.string().required()
+  path: Joi.string().required(),
+  type: Joi.string().required()
 })
 
 module.exports = {
@@ -11,6 +13,10 @@ module.exports = {
 }
 
 async function insert(file) {
+
+  console.log('File: ' +file.name+", path:"+file.path);
   file = await Joi.validate(file, FileSchema, { abortEarly: false });
-  return await new File(file).save();
+  
+  let newFile = await new File(file).save();
+  return newFile;
 }

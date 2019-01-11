@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 const FilePermissionsSchema = new mongoose.Schema({
   fileId: {
-    type: String,
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'File',
     required: true
   },
   userId: {
-    type: String,
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'User',
     required: true
   },
   read: {
@@ -18,7 +20,7 @@ const FilePermissionsSchema = new mongoose.Schema({
     required: true
   },
   delete: {
-    type: Boolean,
+    type: Boolean, 
     required: true
   },
   isOwner: {
