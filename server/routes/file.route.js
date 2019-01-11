@@ -9,7 +9,9 @@ const jwtDecode = require("jwt-decode");
 const router = express.Router();
 const User = require("../models/user.model");
 const Filedb = require("../models/file.model");
-const filePermissions = require("../models/filePermissions.model")
+const filePermissions = require("../models/filePermissions.model");
+const mongoose = require('mongoose');
+
 module.exports = router;
 
 router.use(passport.authenticate('jwt', {
@@ -32,9 +34,11 @@ async function insert(req, res) {
   var form = new formidable.IncomingForm();
 
   form.parse(req);
+
   form.on('fileBegin', function (name, file) {
-    file.path = __dirname + '/../userDirectory/zeyd/'+file.name;
+    file.path = __dirname + '/../userDirectory/jeanmarc/'+file.name;
   });
+
   form.on('file', async function (name, file) {
     let fileToUpload;
     fileToUpload = {
@@ -42,15 +46,11 @@ async function insert(req, res) {
       'path': file.path,
       'type': 'f'
     };
-    console.log('Uploaded ' + file.name + ' to ' + file.path);
 
     fileToUpload = await fileCtrl.insert(fileToUpload);
-
-    var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
-
-
     fileToUpload = fileToUpload.toObject();
 
+    var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
 
     var fileId, userId;
 
@@ -58,10 +58,9 @@ async function insert(req, res) {
       name: fileToUpload.name
     }, (err, res) => {
       fileId = res._id;
-      console.log("response:" +fileId);
     });
     await User.findOne({
-      name: decoded.name
+      fullname: decoded.fullname
     }, (err, res) => {
       userId = res._id;
     });
@@ -76,46 +75,41 @@ async function insert(req, res) {
     };
     permissionToCreate = await persmissionCtrl.insert(permissionToCreate);
 
-    res.json(file + persmissionCtrl);
+    let craftedResponse = {
+      'file': file,
+      'perm': permissionToCreate
+    }
+    
+    res.json(craftedResponse);
   });
 }
 
 async function getFileListByUserId(req, res) {
   
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
-  //console.log(decoded.fullname+"\n")
   let userid;
-  let fileid;
-  //let fileId;
   await User.findOne({fullname:decoded.fullname},(err,res)=> userid = res._id);
-  //await filePermissions.collection.find( {userId:userid} );
-  await filePermissions.findOne({ userId: userid},(err,res)=> fileid = res.fileId);
+  // await filePermissions.findOne({ userId: userid},(err,res)=> fileid = res.fileId);
   
-  console.log(fileid);
+  let FileModel = mongoose.model('File');
+  let FilePermissionsModel = mongoose.model('FilePermissions');
 
-  filePermissions.find({userId:userid}).select({"_id":0,"fileId":1}).populate('fileId').exec(function(err,resp) {
-    var list = [];
-    
-    resp.forEach(element => {
-      //res.send(element)
-      list.push(element.fileId);
-  
-      
-    
-    });
+  FilePermissionsModel.aggregate([
+    {
+      "$lookup": {
+        "from": FileModel.collection.name,
+        "localField": "fileId",
+        "foreignField": "_id",
+        "as": "file"
+      }
+    },
+    { "$unwind": "$file" },
+    { "$match": { "$and": [
+      { "userId": userid },
+      { "file.path": "C:\\Users\\PassTECH\\Documents\\ULB\\2018-2019\\Q1\\Secure Software Design\\Projet NAS\\nas_app\\server\\routes/../userDirectory/jeanmarc/" }
+    ]}}
+  ],
+  function(err, resp) {
     res.send(resp);
-    
-  });
-  
-  /*Filedb.collection.find(
-  {
-    _id: fileid
-  }
-  ).toArray( (error, documents) => {
-    if (error) throw error;
-
-    res.send(documents);
-    
-  });*/
-
+ });
 }
