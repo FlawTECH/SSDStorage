@@ -9,7 +9,6 @@ const jwtDecode = require("jwt-decode");
 const router = express.Router();
 const User = require("../models/user.model");
 const Filedb = require("../models/file.model");
-const filePermissions = require("../models/filePermissions.model");
 const mongoose = require('mongoose');
 
 module.exports = router;
@@ -25,44 +24,73 @@ router.route('/')
   .get(asyncHandler(getFileListByUserId));
 
 router.get('/download/:fileName', function(req, res){
-    var file = __dirname + '/../userDirectory/'+req.params.fileName;
-    res.download(file);
-  });
+  var file = __dirname + '/../userDirectory/'+req.params.fileName;
+  res.download(file);
+});
 
 async function insert(req, res) {
-
+  
   var form = new formidable.IncomingForm();
+  var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
+  
+  //Checking if user has perm to write there
+  let FilePermissionsModel = mongoose.model('FilePermissions');
+  let FileModel = mongoose.model('File');
+  let userId;
+  
+  await User.findOne({
+    fullname: decoded.fullname
+  }, (err, res) => {
+    userId = res._id;
+  });
+
+  FilePermissionsModel.aggregate([
+    {
+      "$lookup": {
+        "from": FileModel.collection.name,
+        "localField": "fileId",
+        "foreignField": "_id",
+        "as": "file"
+      }
+    },
+    // { "$unwind": "$file" },
+    { "$match": { "$and": [
+      { "userId": userId },
+      { "file.path": req.path },
+      { "write": true }
+    ]}}
+  ],
+  function(err, resp) {
+    console.log(err);
+    console.log("lol");
+    console.log(resp);
+  });
+
 
   form.parse(req);
 
   form.on('fileBegin', function (name, file) {
-    file.path = __dirname + '/../userDirectory/jeanmarc/'+file.name;
+    file.path = __dirname + '/../userDirectory/'+decoded.fullname+'/'+file.name;
   });
 
   form.on('file', async function (name, file) {
     let fileToUpload;
     fileToUpload = {
       'name': file.name,
-      'path': file.path,
+      'path': decoded.fullname,
       'type': 'f'
     };
 
     fileToUpload = await fileCtrl.insert(fileToUpload);
     fileToUpload = fileToUpload.toObject();
 
-    var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
 
-    var fileId, userId;
+    var fileId;
 
     await Filedb.findOne({
       name: fileToUpload.name
     }, (err, res) => {
       fileId = res._id;
-    });
-    await User.findOne({
-      fullname: decoded.fullname
-    }, (err, res) => {
-      userId = res._id;
     });
 
     permissionToCreate = {
