@@ -25,14 +25,13 @@ export class ListDirectoryComponent implements OnInit {
     console.log(this.tmpList)
     this.fileService.getFile("zeyd").subscribe(
       (res) =>{
-        var tmpFileList = File.fromArrayJSON(res);
-        tmpFileList.forEach(element => {
-          
-            this.userFileList.push(element)
-          
-          
+        //console.log(res);
+        res.forEach(element => {
+          this.userFileList.push(File.fromJSON(element.file))
         });
-        console.log(tmpFileList)
+        
+        
+        console.log(this.userFileList)
       }
     )
     
