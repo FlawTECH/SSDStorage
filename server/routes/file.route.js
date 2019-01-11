@@ -16,10 +16,16 @@ router.use(passport.authenticate('jwt', {
   session: false
 }))
 
+
 router.route('/')
   .post(asyncHandler(insert));
 router.route('/')
   .get(asyncHandler(getFileListByUserId));
+
+router.get('/download/:fileName', function(req, res){
+    var file = __dirname + '/../userDirectory/'+req.params.fileName;
+    res.download(file);
+  });
 
 async function insert(req, res) {
 
