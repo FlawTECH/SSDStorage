@@ -5,7 +5,6 @@ const asyncHandler = require('express-async-handler');
 const fileCtrl = require('../controllers/file.controller');
 const persmissionCtrl = require('../controllers/filePermissions.controller');
 var formidable = require('formidable');
-const testFolder = './uploads/';
 const jwtDecode = require("jwt-decode");
 const router = express.Router();
 const User = require("../models/user.model");
@@ -26,16 +25,10 @@ async function insert(req, res) {
 
   var form = new formidable.IncomingForm();
 
-
-
   form.parse(req);
-
   form.on('fileBegin', function (name, file) {
     file.path = __dirname + '/../userDirectory/' + file.name;
-
   });
-
-
   form.on('file', async function (name, file) {
     let fileToUpload;
     fileToUpload = {
@@ -59,6 +52,7 @@ async function insert(req, res) {
       name: fileToUpload.name
     }, (err, res) => {
       fileId = res._id;
+      console.log("response:" +fileId);
     });
     await User.findOne({
       name: decoded.name
@@ -81,12 +75,9 @@ async function insert(req, res) {
 }
 
 async function getFileListByUserId(req, res) {
-
+  
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
-
   
-  
-
   Filedb.collection.find({
     userId: User.findOne({
       name: decoded.name
@@ -95,5 +86,6 @@ async function getFileListByUserId(req, res) {
     if (error) throw error;
 
     res.send(documents);
+    console.log(documents[1].name);
   });
 }

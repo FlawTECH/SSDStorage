@@ -15,6 +15,11 @@ router.get('/health-check', (req, res) =>
   res.send('OK')
 );
 
+router.get('/download/:fileName', function(req, res){
+  var file = __dirname + '/../userDirectory/'+req.params.fileName;
+  res.download(file);
+});
+
 router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
 router.use('/userState', userStateRoutes);
