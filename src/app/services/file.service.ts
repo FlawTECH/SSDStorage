@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import * as jwtDecode from 'jwt-decode';
 
@@ -15,8 +15,12 @@ export class FileService {
   }
 
   //GET All files
-  getFile(): Observable<any> {
-    return this.http.get(this.linkApi)
+  getFile(path:string): Observable<any> {
+    
+ 
+    return this.http.get(this.linkApi,{
+      params: new HttpParams().set('path', path + '')
+    })
   }
 
 }

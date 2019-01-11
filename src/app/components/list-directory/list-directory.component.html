@@ -1,12 +1,13 @@
 <mat-accordion class="example-headers-align">
-  <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+  <mat-expansion-panel *ngFor="let item of tmpList; index as i" (opened)="fire(i)">
     <mat-expansion-panel-header>
       <mat-panel-title>
         FOLDER_NAME
       </mat-panel-title>
-      <mat-panel-description>
-        Currently I am {{panelOpenState ? 'open' : 'closed'}}
-        <mat-icon>{{panelOpenState ? 'folder_open' : 'folder_closed'}}</mat-icon>
+      
+      <mat-panel-description class="example-headers-align">
+        
+        <mat-icon >folder_open</mat-icon>
       </mat-panel-description>
     </mat-expansion-panel-header>
     

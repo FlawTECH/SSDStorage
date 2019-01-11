@@ -85,6 +85,7 @@ async function insert(req, res) {
 }
 
 async function getFileListByUserId(req, res) {
+  console.log(req.query.path);
   
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   let userid;
@@ -106,7 +107,7 @@ async function getFileListByUserId(req, res) {
     { "$unwind": "$file" },
     { "$match": { "$and": [
       { "userId": userid },
-      { "file.path": "C:\\Users\\PassTECH\\Documents\\ULB\\2018-2019\\Q1\\Secure Software Design\\Projet NAS\\nas_app\\server\\routes/../userDirectory/jeanmarc/" }
+      { "file.path": __dirname+"../userDirectory/"+req.query.path }
     ]}}
   ],
   function(err, resp) {
