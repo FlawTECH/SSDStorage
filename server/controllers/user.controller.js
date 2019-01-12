@@ -2,7 +2,8 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const User = require('../models/user.model');
 const WrongStatusError = require('../errors').WrongStatusError
-const UserState = require('../models/userState.model');
+const fs = require('fs');
+
 
 const userSchema = Joi.object({
   fullname: Joi.string().required(),
@@ -58,7 +59,7 @@ function setStatus(id, newStatus, callback) {
       return callback(new WrongStatusError('A deleted user can not change status'), null)
     }
 
-    if (newStatus == status.WAITING) {
+    if (newStatus == states.WAITING) {
       return callback(new WrongStatusError ('A user can not go back to waiting status'), null)
     }
     
@@ -69,7 +70,16 @@ function setStatus(id, newStatus, callback) {
     User.updateOne(doc, {'status': newStatus}, (err, doc) => {
       callback(err, doc)
     })
+    createDirectory(doc);
   })
+}
+
+function createDirectory(doc) {
+  fullname = bcrypt.hashSync(doc.fullname, 10);
+  var dir = __dirname + "/../userDirectory/"+ fullname;
+  if (!fs.existsSync(dir)){
+  fs.mkdirSync(dir);
+  }
 }
 
 module.exports = {

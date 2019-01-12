@@ -32,6 +32,8 @@ export class AuthService {
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
         fullname,
+        status,
+        roles,
         password,
         repeatPassword
       }).subscribe((data : any) => {
