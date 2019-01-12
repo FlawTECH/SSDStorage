@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  pseudo: {
+  fullname: {
     type: String,
     required: true,
     unique: true
@@ -18,17 +18,20 @@ const UserSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  },
-  stateId: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'UserState',
-    required: true
-  },
-  isAdmin: {
-    type: Boolean,
-    required: true,
-    default: false
-  }
+  },  
+  roles: [{
+    type: String
+  }]
+  // stateId: {
+  //   type: mongoose.SchemaTypes.ObjectId,
+  //   ref: 'UserState',
+  //   required: true
+  // },
+  // isAdmin: {
+  //   type: Boolean,
+  //   required: true,
+  //   default: false
+  // }
 }, {
   versionKey: false
 });

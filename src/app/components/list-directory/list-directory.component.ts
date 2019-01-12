@@ -13,7 +13,7 @@ export class ListDirectoryComponent implements OnInit {
   private userFileList: File[] = [];
   private userFolderList : File[] = [];
   private username 
-  private tmpList : any[]=[
+  private tmpList : any[] = [
     {id:"1", name:"folder1"},{id:"2", name:"folder2"}
   ];
 
@@ -27,22 +27,15 @@ export class ListDirectoryComponent implements OnInit {
       (res) =>{
         var tmpFileList = File.fromArrayJSON(res);
         tmpFileList.forEach(element => {
-          
             this.userFileList.push(element)
-          
-          
         });
         console.log(tmpFileList)
       }
     )
-    
   }
 
   fire(i){
     console.log(i+" got clicked");
-    
-    console.log()
-    
   }
 
 }

@@ -20,19 +20,23 @@ const states = {
 }
 
 async function insert(user) {
+  console.log(user)
   if (user.roles.indexOf('admin') > -1 && user.status !== "Active")
     throw new WrongStatusError ('An admin must be active when registering')
   if (user.roles.indexOf('admin') < 0 && user.status !== "Waiting")
     throw new WrongStatusError ('A user must be waiting when registering')
-  
+  // user = await Joi.validate(user, userSchema, { abortEarly: false });
+  // user.hashedPassword = bcrypt.hashSync(user.password, 10);
+  // delete user.password;
+  // await UserState.findOne({name: 'DISABLED'}, async function(err, res) {
+  //   user.stateId = res._id;
+  //   console.log(res);
+  //   // dbUser.stateId.push(res);
+  // });
+  // return await new User(user).save();
   user = await Joi.validate(user, userSchema, { abortEarly: false });
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
-  await UserState.findOne({name: 'DISABLED'}, async function(err, res) {
-    user.stateId = res._id;
-    console.log(res);
-    // dbUser.stateId.push(res);
-  });
   return await new User(user).save();
 }
 
