@@ -32,12 +32,6 @@ export class ListDirectoryComponent implements OnInit {
     )
   }
 
-<<<<<<< HEAD
-  fire(i){
-    console.log(i+" got clicked");
-  }
-=======
   
->>>>>>> master
 
 }
