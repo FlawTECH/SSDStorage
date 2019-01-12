@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FileService } from '../../services/file.service';
 import { File } from '../../class/file';
+import * as jwtDecode from 'jwt-decode';
 
 
 @Component({
@@ -12,30 +13,31 @@ export class ListDirectoryComponent implements OnInit {
 
   private userFileList: File[] = [];
   private userFolderList : File[] = [];
-  private username 
-  private tmpList : any[] = [
-    {id:"1", name:"folder1"},{id:"2", name:"folder2"}
-  ];
-
+  
+  private token:any;
   constructor(private fileService:FileService) {
-
+    this.token = jwtDecode(localStorage.getItem("AuthToken"));
   }
 
   ngOnInit() {
-    console.log(this.tmpList)
-    this.fileService.getFile("zeyd").subscribe(
+    
+    this.fileService.getFile(this.token.fullname).subscribe(
       (res) =>{
-        var tmpFileList = File.fromArrayJSON(res);
-        tmpFileList.forEach(element => {
-            this.userFileList.push(element)
+        //console.log(res);
+        res.forEach(element => {
+          this.userFileList.push(File.fromJSON(element.file))
         });
-        console.log(tmpFileList)
+        console.log(this.userFileList)
       }
     )
   }
 
+<<<<<<< HEAD
   fire(i){
     console.log(i+" got clicked");
   }
+=======
+  
+>>>>>>> master
 
 }

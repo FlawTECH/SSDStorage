@@ -33,8 +33,6 @@ export class AuthService {
       this.http.post('/api/auth/register', {
         fullname,
         password,
-        status,
-        roles,
         repeatPassword
       }).subscribe((data : any) => {
         observer.next({user: data.user});
