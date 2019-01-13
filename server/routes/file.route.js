@@ -196,9 +196,7 @@ async function insert(req, res) {
   })
 }
 
-async function getFileListByUserId(req, res) {
-  console.log(req.query.path);
-  
+async function getFileListByUserId(req, res) {  
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   let userid = decoded._id;
   
