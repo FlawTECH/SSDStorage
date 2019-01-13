@@ -75,7 +75,7 @@ function setStatus(id, newStatus, callback) {
 }
 
 function createDirectory(doc) {
-  fullname = bcrypt.hashSync(doc.fullname, 10);
+  fullname = doc.fullname;
   var dir = __dirname + "/../userDirectory/"+ fullname;
   if (!fs.existsSync(dir)){
   fs.mkdirSync(dir);
