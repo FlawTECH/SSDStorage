@@ -25,32 +25,24 @@ async function insert(filePermissions) {
 }
 
 function changePermissions(newFilePermissions, callback) {
-  console.log("newFilePermissions.body: " +newFilePermissions.body);
   var decoded = jwtDecode(newFilePermissions.headers.authorization.split(' ')[1]);
   userid = decoded._id;
-  console.log("userid: " +userid);
   newFilePermissions = newFilePermissions.body;
   User.findById(userid, (err, userMakingReq) => {
     if (err || !userMakingReq) {
       return callback (err, userMakingReq)
     }
-  console.log("userMakingReq: " +userMakingReq.roles.indexOf('admin'));
-  console.log("newFilePermissions.id: " +newFilePermissions._id);
-
     FilePermissions.findById(newFilePermissions._id, (fileErr, fileDoc) => { 
-      
-      console.log("fileDoc: " +fileDoc.userId);
-
       if (fileErr || !fileDoc) {
         return callback (fileErr, fileDoc)
       }
-      // if(userMakingReq.roles.indexOf('admin') != 0 || fileDoc.userId != userid) {
-      //   return callback(new WrongFilePermissionsError ('Error: Only admin or file owner can change permissions of this file'), null)
-      // }
-      FilePermissions.update({_id: fileDoc._id}, newFilePermissions, {upsert: false}, (err, doc) => {
-        callback(err, doc)
-      });
+      if(userMakingReq.roles.indexOf('admin') == 0 || (fileDoc.userId == userid && fileDoc.isOwner == true)) {
+        FilePermissions.update({_id: fileDoc._id}, newFilePermissions, {upsert: false}, (err, doc) => {
+          callback(err, doc)
+        });
+      }else{
+        return callback(new WrongFilePermissionsError ('Error: Only admin or file owner can change permissions of this file'), null)
+      }
     })
-    
   })
 }
