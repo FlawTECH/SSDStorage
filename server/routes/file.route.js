@@ -123,7 +123,7 @@ async function insert(req, res) {
       }
       else {
         //TODO throw error
-        res.status(500).end(); return;
+        res.status(401).end(); return;
       }
     });
   })
