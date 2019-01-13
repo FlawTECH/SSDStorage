@@ -59,7 +59,14 @@ async function insert(req, res) {
 
     //Checking authorization
     userId = new mongoose.Types.ObjectId(decoded._id);
-    
+
+    let subfolderCount = incomingFiles.length>0?1:2
+    let subDirPath = filePath.split('/', filePath.split('/').length-subfolderCount).join('/');
+    let subDirName = filePath.split('/').slice(filePath.split('/').length-subfolderCount,filePath.split('/').length-subfolderCount+1).join('');
+
+    console.log(subDirPath);
+    console.log(subDirName);
+
     //Checking if user has perm to write there
     FilePermissionsModel.aggregate([
       {
@@ -72,7 +79,8 @@ async function insert(req, res) {
       },
       { "$match": { "$and": [
         { "userId": userId },
-        { "file.path": filePath.split('/')[0] },
+        { "file.name": subDirName },
+        { "file.path": "/"+subDirPath },
         { "file.type": "d" },
         { "write": true }
       ]}}
@@ -93,7 +101,48 @@ async function insert(req, res) {
             );
           });
         }
-        else {
+        else if(incomingFiles.length == 0) { //Create directory
+
+          let dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
+          let dirName = filePath.split('/').slice(filePath.split('/').length-1,filePath.split('/').length).join('');
+
+          let folder = {
+            'name': dirName,
+            'path': "/"+dirPath,
+            'type': 'd'
+          }
+
+          var folderId;
+          fileCtrl.insert(folder).then(
+            insertedFolder => {
+              folder = insertedFolder;
+              Filedb.findOne({
+                name: folder.name
+              }, (err, dbRes) => {
+                folderId = dbRes._id;
+                folder = folder.toObject();
+      
+                permissionToCreate = {
+                  'fileId': folderId,
+                  'userId': userId,
+                  'read': true,
+                  'write': true,
+                  'delete': true,
+                  'isOwner': true,
+                };
+                persmissionCtrl.insert(permissionToCreate).then(
+                  permissionToCreate => {
+                    let craftedResponse = {
+                      'file': incomingFiles[0],
+                      'perm': permissionToCreate
+                    }
+                  }
+                );
+              });
+            }
+          );
+        }
+        else { // Upload files
           for(let i=0; i<incomingFiles.length; i++) {
             fs.moveSync(incomingFiles[i].path, __dirname+"/../userDirectory/"+filePath+"/"+incomingFiles[i].name, function(err) {
               if(err) throw(err);
@@ -102,7 +151,7 @@ async function insert(req, res) {
             //Adding perm to DB
             let fileToUpload = {
               'name': incomingFiles[i].name,
-              'path': filePath,
+              'path': (subDirPath.length>0?"/":"")+subDirPath+"/"+subDirName,
               'type': 'f'
             };
         
@@ -137,7 +186,7 @@ async function insert(req, res) {
             );
           }
         }
-        res.json("Upload successful");
+        res.json("OK");
       }
       else {
         //TODO throw error

@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const User = require('../models/user.model');
+const fileCtrl = require('../controllers/file.controller');
+const permissionsCtrl = require('../controllers/filePermissions.controller');
 const WrongStatusError = require('../errors').WrongStatusError
 const fs = require('fs');
 
@@ -71,6 +73,7 @@ function setStatus(id, newStatus, callback) {
       callback(err, doc)
     })
     createDirectory(doc);
+    initDefaultPermissions(doc);
   })
 }
 
@@ -80,6 +83,32 @@ function createDirectory(doc) {
   if (!fs.existsSync(dir)){
   fs.mkdirSync(dir);
   }
+}
+
+function initDefaultPermissions(doc) {
+  let rootFolder = {
+    'name': doc.fullname,
+    'path': '/',
+    'type': 'd'
+  }
+
+  //First, insert file
+  fileCtrl.insert(rootFolder).then(
+    (insertedFile) => {
+      let permissionToCreate = {
+        'fileId': insertedFile._id,
+        'userId': doc._id,
+        'read': true,
+        'write': true,
+        'delete': true,
+        'isOwner': true,
+      };
+
+      //Then, insert file permission
+      permissionsCtrl.insert(permissionToCreate);
+    }
+  );
+
 }
 
 module.exports = {
