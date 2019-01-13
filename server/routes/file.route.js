@@ -171,7 +171,7 @@ async function getFileListByUserId(req, res) {
     { "$unwind": "$file" },
     { "$match": { "$and": [
       { "userId": userid },
-      { "file.path": __dirname + "/../userDirectory/"+req.query.path+"/" }
+      { "file.path": req.query.path }
     ]}}
   ],
   function(err, resp) {
