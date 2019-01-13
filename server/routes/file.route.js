@@ -11,7 +11,7 @@ const User = require("../models/user.model");
 const Filedb = require("../models/file.model");
 const filePermissions = require("../models/filePermissions.model");
 const mongoose = require('mongoose');
-const fs = require('fs');
+const fs = require('fs-extra');
 
 module.exports = router;
 
@@ -69,92 +69,71 @@ async function insert(req, res) {
       // { "$unwind": "$file" },
       { "$match": { "$and": [
         { "userId": userId },
-        { "file.path": filePath },
+        { "file.path": filePath.split('/')[0] },
         { "file.type": "d" },
         { "write": true }
       ]}}
     ]).count("authorizedCount").exec(function(err, dbRes) {
-      console.log("I'm waiting "+dbRes.length);
       if(dbRes.length>0) {
         //File can be written here
-        fs.rename(incomingFiles[0].path, __dirname+"/../userDirectory/"+filePath+"/"+incomingFiles[0].name, function(err) {
-          if(err) throw(err);
-        })
-        //Adding perm to DB
+        fs.ensureDirSync(__dirname+"/../userDirectory/"+filePath)
+        for(let i=0; i<incomingFiles.length; i++) {
+          fs.moveSync(incomingFiles[i].path, __dirname+"/../userDirectory/"+filePath+"/"+incomingFiles[i].name, function(err) {
+            if(err) throw(err);
+          })
 
-        let fileToUpload = {
-          'name': incomingFiles[0].name,
-          'path': filePath,
-          'type': 'f'
-        };
-    
-        var fileId;
-    
-        fileCtrl.insert(fileToUpload).then(
-          insertedFile => {
-            fileToUpload = insertedFile;
-            Filedb.findOne({
-              name: fileToUpload.name
-            }, (err, dbRes) => {
-              fileId = dbRes._id;
-              fileToUpload = fileToUpload.toObject();
-    
-              permissionToCreate = {
-                'fileId': fileId,
-                'userId': userId,
-                'read': true,
-                'write': true,
-                'delete': true,
-                'isOwner': true,
-              };
-              persmissionCtrl.insert(permissionToCreate).then(
-                permissionToCreate => {
-                  let craftedResponse = {
-                    'file': incomingFiles[0],
-                    'perm': permissionToCreate
+          //Adding perm to DB
+          let fileToUpload = {
+            'name': incomingFiles[i].name,
+            'path': filePath,
+            'type': 'f'
+          };
+      
+          var fileId;
+          fileCtrl.insert(fileToUpload).then(
+            insertedFile => {
+              fileToUpload = insertedFile;
+              Filedb.findOne({
+                name: fileToUpload.name
+              }, (err, dbRes) => {
+                fileId = dbRes._id;
+                fileToUpload = fileToUpload.toObject();
+      
+                permissionToCreate = {
+                  'fileId': fileId,
+                  'userId': userId,
+                  'read': true,
+                  'write': true,
+                  'delete': true,
+                  'isOwner': true,
+                };
+                persmissionCtrl.insert(permissionToCreate).then(
+                  permissionToCreate => {
+                    let craftedResponse = {
+                      'file': incomingFiles[0],
+                      'perm': permissionToCreate
+                    }
                   }
-                  res.json(craftedResponse);
-                }
-              );
-            });
-          }
-        );
+                );
+              });
+            }
+          );
+        }
+        res.json("Upload successful");
       }
       else {
         //TODO throw error
+        res.status(500).end(); return;
       }
     });
   })
-
-  // form.on('field', async function(name, value) {
-  //   console.log('received non file');
-
-  //   if(name === "path") { filePath = value; }
-  //   if(filePath == undefined) { invalidPath = true; return; }
-    
-    
-  // });
-  
-  // if(invalidPath) { res.status(500).end(); return; }
-
-  // form.on('fileBegin', function (name, file) {
-  //   console.log("parsing");
-  //   file.path = __dirname + '/../userDirectory/'+decoded.fullname+'/'+file.name;
-  // });
-  
-  // form.on('file', async function (name, file) {
-  //   console.log("received file")
-
-  // });
 }
 
 async function getFileListByUserId(req, res) {
   console.log(req.query.path);
   
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
-  let userid;
-  await User.findOne({fullname:decoded.fullname},(err,res)=> userid = res._id);
-  // await filePermissions.findOne({ userId: userid},(err,res)=> fileid = res.fileId);
+  let userid = decoded._id;
   
   let FileModel = mongoose.model('File');
   let FilePermissionsModel = mongoose.model('FilePermissions');
@@ -170,7 +149,7 @@ async function getFileListByUserId(req, res) {
     },
     { "$unwind": "$file" },
     { "$match": { "$and": [
-      { "userId": userid },
+      { "userId": new mongoose.Types.ObjectId(userid) },
       { "file.path": req.query.path }
     ]}}
   ],
