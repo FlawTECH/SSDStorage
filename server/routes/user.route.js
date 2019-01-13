@@ -13,6 +13,7 @@ router.route('/')
 
 async function insert(req, res) { // might have to delete this function later since it's not used atm
   const user = await userCtrl.insert(req.body);
+  console.log("test: "+req.body)
   res.json(user);
 }
 
