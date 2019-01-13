@@ -30,39 +30,79 @@ router.get('/download/:fileName', function(req, res){
   });
 
 async function insert(req, res) {
-
+  
+  //Checking if user has perm to write there
+  let FilePermissionsModel = mongoose.model('FilePermissions');
+  let FileModel = mongoose.model('File');
+  let userId;
+  let filePath;
+  let invalidPath = false;
+  
   var form = new formidable.IncomingForm();
+  var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
 
-  form.parse(req);
+  form.parse(req, async function(err, fields, files) {
+    filePath = fields.path;
+
+    if(filePath == undefined) { invalidPath = true; return; }
+
+    await User.findOne({
+      fullname: decoded.fullname
+    }, (err, res) => {
+      userId = res._id;
+    });
+
+    await FilePermissionsModel.aggregate([
+      {
+        "$lookup": {
+          "from": FileModel.collection.name,
+          "localField": "fileId",
+          "foreignField": "_id",
+          "as": "file"
+        }
+      },
+      // { "$unwind": "$file" },
+      { "$match": { "$and": [
+        { "userId": userId },
+        { "file.path": filePath },
+        { "file.type": "d" },
+        { "write": true }
+      ]}}
+    ]).count("authorizedCount").exec(function(err, res) {
+      if(res.length>0) {
+        form.parse(req);
+      }
+      else {
+        files=[];
+      }
+    });
+  });
+
+  if(invalidPath) { res.status(500).end(); return; }
 
   form.on('fileBegin', function (name, file) {
-    file.path = __dirname + '/../userDirectory/jeanmarc/'+file.name;
+    console.log("parsing ...");
+    file.path = __dirname + '/../userDirectory/'+decoded.fullname+'/'+file.name;
   });
 
   form.on('file', async function (name, file) {
     let fileToUpload;
     fileToUpload = {
       'name': file.name,
-      'path': file.path,
+      'path': decoded.fullname,
       'type': 'f'
     };
 
     fileToUpload = await fileCtrl.insert(fileToUpload);
     fileToUpload = fileToUpload.toObject();
 
-    var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
 
-    var fileId, userId;
+    var fileId;
 
     await Filedb.findOne({
       name: fileToUpload.name
     }, (err, res) => {
       fileId = res._id;
-    });
-    await User.findOne({
-      fullname: decoded.fullname
-    }, (err, res) => {
-      userId = res._id;
     });
 
     permissionToCreate = {

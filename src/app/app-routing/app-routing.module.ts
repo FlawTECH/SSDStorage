@@ -6,6 +6,7 @@ import { ManagerComponent } from '../components/manager/manager.component';
 import { ListDirectoryComponent } from '../components/list-directory/list-directory.component';
 import { IsLoggedInGuard } from '../guards/is-logged-in.guard';
 import { OpenGuard } from '../guards/open.guard';
+import { FileUploadComponent } from '../components/file-upload/file-upload.component';
 
 const routes: Routes = [{
   path:'',
@@ -31,7 +32,10 @@ const routes: Routes = [{
   {
     path:'directories',
     component:ListDirectoryComponent,
-
+  },
+  {
+    path:'upload',
+    component: FileUploadComponent
   }
 ]
 }];

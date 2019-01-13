@@ -2,12 +2,12 @@ export class User {
     private _id: string;
     private _fullName: string;
     private _password: string;
-    private _stateId: string;
-    private _isAdmin: boolean;
+    private _state: string;
+    private _roles: string[];
 
-    constructor(fullName?: string, isAdmin?: boolean) {
+    constructor(fullName?: string, roles?: string[]) {
         this._fullName = fullName;
-        this._isAdmin = isAdmin;
+        this._roles = roles;
     }
 
     public get id(): string {
@@ -22,12 +22,12 @@ export class User {
         return this._password;
     }
 
-    public get stateId(): string {
-        return this._stateId;
+    public get state(): string {
+        return this._state;
     }
 
-    public get isAdmin(): boolean {
-        return this._isAdmin;
+    public get roles(): string[] {
+        return this._roles;
     }
 
     public set id(value:string) {
@@ -42,18 +42,18 @@ export class User {
         this.password = value;
     }
 
-    public set stateId(value:string) {
-        this._stateId = value;
+    public set state(value:string) {
+        this._state = value;
     }
 
-    public set isAdmin(value:boolean) {
-        this._isAdmin = value;
+    public set roles(value:string[]) {
+        this._roles = value;
     }
 
     public static fromJSON(rawUser : any) : User {
-        const tmpUser = new User(rawUser['fullname'], rawUser['isAdmin']);
+        const tmpUser = new User(rawUser['fullname'], rawUser['roles']);
         tmpUser.id = rawUser['_id'];
-        tmpUser.stateId = rawUser['stateId'];
+        tmpUser.state = rawUser['state'];
         tmpUser.password = rawUser['password'];
         return tmpUser;
     }
@@ -67,8 +67,8 @@ export class User {
             "_id" : this._id,
             "fullname": this._fullName,
             "password": this._password,
-            "stateId": this._stateId,
-            "isAdmin" : this._isAdmin
+            "state": this._state,
+            "roles" : this._roles
         };
     }
 }

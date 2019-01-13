@@ -23,4 +23,11 @@ export class FileService {
     })
   }
 
+  //POST New file
+  uploadFile(path:string, file: any): Observable<any> {
+    return this.http.post(this.linkApi, {
+      params: new HttpParams().set('path', path).append('lol', 'test')
+    })
+  }
+
 }
