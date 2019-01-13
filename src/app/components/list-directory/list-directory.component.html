@@ -1,40 +1,34 @@
 <mat-accordion class="example-headers-align">
-  <div *ngFor="let item of userFileList; index as i">
-    <div *ngIf="item.type =='f'; else folder">
-      <mat-list>
-       
-        <mat-list-item>
-          <mat-icon mat-list-icon>insert_drive_file</mat-icon>
-          <h4 mat-line>{{item.name}}</h4>
-          <p mat-line> {{item.createdAt | date}} </p>
-          <button mat-icon-button (click)="onClick" color="primary">
-              <mat-icon class="mat-18">cloud_download</mat-icon>
-          </button>
-       </mat-list-item>
 
-      </mat-list>
-    </div>
+  <div>
 
-    <ng-template #folder>
-      <mat-expansion-panel (opened)="fire(i)" >
+    <mat-list>
+      <h3 mat-subheader>Current path: {{currentPath}} </h3>
+      <mat-expansion-panel (opened)="fire()" *ngFor="let item of userFolderList; index as i">
         <mat-expansion-panel-header>
           <mat-panel-title>
             {{item.name}}
           </mat-panel-title>
 
           <mat-panel-description class="example-headers-align">
-            created at: {{item.createdAt}}
-
+            <!--             created at: {{item.createdAt}}
+     --> type: {{item.type ==="f"? 'folder':'directory'}}
           </mat-panel-description>
-          <mat-icon>{{item.type=="f"? 'insert_drive_file' : 'folder'}}</mat-icon>
+          <mat-icon>folder</mat-icon>
         </mat-expansion-panel-header>
 
 
       </mat-expansion-panel>
-    </ng-template>
+      <mat-list-item *ngFor="let item of userFileList; index as i">
+        <mat-icon mat-list-icon>insert_drive_file</mat-icon>
+        <h4 mat-line>{{item.name}}</h4>
+        <p mat-line> {{item.createdAt | date}} </p>
+        <button mat-icon-button (click)="onClick" color="primary">
+          <mat-icon class="mat-18">cloud_download</mat-icon>
+        </button>
+      </mat-list-item>
 
-
+    </mat-list>
   </div>
-
 
 </mat-accordion>
