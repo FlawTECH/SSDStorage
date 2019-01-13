@@ -12,6 +12,7 @@ const Filedb = require("../models/file.model");
 const filePermissions = require("../models/filePermissions.model");
 const mongoose = require('mongoose');
 const fs = require('fs-extra');
+const jszip = require('jszip');
 
 module.exports = router;
 
@@ -37,6 +38,7 @@ async function insert(req, res) {
   let userId;
   let filePath;
   let incomingFiles = [];
+  let unzipFiles = false;
   
   var form = new formidable.IncomingForm();
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
@@ -48,11 +50,13 @@ async function insert(req, res) {
 
   form.on('field', function(name, value) {
     if(name === "path") { filePath = value; }
+    if(name === "isfolder" && value === "true") { unzipFiles = true; }
   });
 
   form.on('end', function() {
     //All files and fields have been processed
     //TODO throw error on empty filepath
+
     //Checking authorization
     userId = new mongoose.Types.ObjectId(decoded._id);
     
@@ -66,7 +70,6 @@ async function insert(req, res) {
           "as": "file"
         }
       },
-      // { "$unwind": "$file" },
       { "$match": { "$and": [
         { "userId": userId },
         { "file.path": filePath.split('/')[0] },
@@ -75,49 +78,64 @@ async function insert(req, res) {
       ]}}
     ]).count("authorizedCount").exec(function(err, dbRes) {
       if(dbRes.length>0) {
+
         //File can be written here
         fs.ensureDirSync(__dirname+"/../userDirectory/"+filePath)
-        for(let i=0; i<incomingFiles.length; i++) {
-          fs.moveSync(incomingFiles[i].path, __dirname+"/../userDirectory/"+filePath+"/"+incomingFiles[i].name, function(err) {
-            if(err) throw(err);
-          })
 
-          //Adding perm to DB
-          let fileToUpload = {
-            'name': incomingFiles[i].name,
-            'path': filePath,
-            'type': 'f'
-          };
-      
-          var fileId;
-          fileCtrl.insert(fileToUpload).then(
-            insertedFile => {
-              fileToUpload = insertedFile;
-              Filedb.findOne({
-                name: fileToUpload.name
-              }, (err, dbRes) => {
-                fileId = dbRes._id;
-                fileToUpload = fileToUpload.toObject();
-      
-                permissionToCreate = {
-                  'fileId': fileId,
-                  'userId': userId,
-                  'read': true,
-                  'write': true,
-                  'delete': true,
-                  'isOwner': true,
-                };
-                persmissionCtrl.insert(permissionToCreate).then(
-                  permissionToCreate => {
-                    let craftedResponse = {
-                      'file': incomingFiles[0],
-                      'perm': permissionToCreate
+        //Unzip if dir upload
+        if(unzipFiles) {
+          fs.readFile(incomingFiles[0].path, function(err, data) {
+            if(err) throw err;
+            jszip.loadAsync(data).then(
+              (zip) => {
+                console.log(zip.files);
+              }
+            );
+          });
+        }
+        else {
+          for(let i=0; i<incomingFiles.length; i++) {
+            fs.moveSync(incomingFiles[i].path, __dirname+"/../userDirectory/"+filePath+"/"+incomingFiles[i].name, function(err) {
+              if(err) throw(err);
+            })
+
+            //Adding perm to DB
+            let fileToUpload = {
+              'name': incomingFiles[i].name,
+              'path': filePath,
+              'type': 'f'
+            };
+        
+            var fileId;
+            fileCtrl.insert(fileToUpload).then(
+              insertedFile => {
+                fileToUpload = insertedFile;
+                Filedb.findOne({
+                  name: fileToUpload.name
+                }, (err, dbRes) => {
+                  fileId = dbRes._id;
+                  fileToUpload = fileToUpload.toObject();
+        
+                  permissionToCreate = {
+                    'fileId': fileId,
+                    'userId': userId,
+                    'read': true,
+                    'write': true,
+                    'delete': true,
+                    'isOwner': true,
+                  };
+                  persmissionCtrl.insert(permissionToCreate).then(
+                    permissionToCreate => {
+                      let craftedResponse = {
+                        'file': incomingFiles[0],
+                        'perm': permissionToCreate
+                      }
                     }
-                  }
-                );
-              });
-            }
-          );
+                  );
+                });
+              }
+            );
+          }
         }
         res.json("Upload successful");
       }
