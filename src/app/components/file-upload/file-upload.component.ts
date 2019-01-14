@@ -12,30 +12,7 @@ import { User } from '../../class/user';
   styleUrls: ['./file-upload.component.scss']
 })
 export class FileUploadComponent implements OnInit {
-  /*public pickedFile: any;
-  public path: string;
-
-  
-
-  private _fileService: FileService;
-
-  constructor(private fileService: FileService) {
-    this._fileService = fileService;
-  }
-
-  ngOnInit() {
-    this.path = jwtDecode(localStorage.getItem('AuthToken')).fullname;
-    console.log(this.uploadType);
-    
-  }
-
-  uploadFiles() {
-    console.log(this.pickedFile);
-    this._fileService.uploadFile(this.path, this.pickedFile).subscribe((res) => {
-      console.log(res);
-    })
-  }
-*/
+ 
   @Input()
   public uploadType:String;
   @Input()
@@ -53,16 +30,11 @@ export class FileUploadComponent implements OnInit {
   private user:User;
   private fileList = [];
   private fileNameList: string[];
-
-  
-
   private gridSize: string = "75px";
   @ViewChild('fileInput') fileInput: ElementRef;
 
-
   constructor(private fb: FormBuilder, private fileService: FileService, public snackBar: MatSnackBar) {
     this.user = new User("",[]);
-
     this.createForm();
   }
 
@@ -73,14 +45,11 @@ export class FileUploadComponent implements OnInit {
   ngOnInit() {
     this.fileNameValidFade = "fadeOut";
     this.fileNameInvalidFade = "fadeOut";
-    this.fileNameList = [];
-    
-    this.gridSize = "75px";
-    
+    this.fileNameList = [];  
+    this.gridSize = "75px";  
   }
 
   openSnackBar(message: string, action: string, type?: string) {
-
     this.snackBar.open(
       message,
       action,
@@ -99,36 +68,34 @@ export class FileUploadComponent implements OnInit {
   }
 
   onFileChange(event) {
-
     this.fileNameValidFade = "fadeOut";
     this.fileNameInvalidFade = "fadeOut";
     this.collapsed();
     /* this.gridState="expanded"; */
-
     this.fileNameList = [];
-    
     this.form.get('document').setValue(null);
 
     if (event.target.files.length > 0) {
       this.form.get('document').setValue(event.target.files);
-      
+     
       for (let i = 0; i < event.target.files.length; i++) {
         let file = event.target.files[i];
         this.fileList = Array.from(event.target.files);
-
-        this.fileNameList.push(file.name);
-
-        
+        this.fileNameList.push(file.name);        
         this.valid = true;
+
       }
       this.setGridSize()
       this.toggleValidAnimation();
       this.toggleInvalidAnimation();
+
     } else {
       this.setGridSize()
       this.valid = false;
+
     }
   }
+
   prepareSave(): any {
     let input = new FormData();
     for (let index = 0; index < this.form.get('document').value.length; index++) {     
@@ -140,19 +107,12 @@ export class FileUploadComponent implements OnInit {
 
   onSubmit() {
     this.loading = true;
-    //this.cancel=false;
-    const formModel = this.prepareSave();
-    // this.http.post('apiUrl', formModel)
-
-    
-      
-      
+    const formModel = this.prepareSave();    
       console.log(this.user)
       const request = this.fileService.postFile(formModel,this.currentPath).subscribe(
         result => {
           if (result == "OK") {
-            this.loading = false;
-            
+            this.loading = false;         
             this.openSnackBar("All files were uploaded with succes!", "Close", "success");
             this.clearValidFiles();
             this.valid = false
@@ -163,32 +123,23 @@ export class FileUploadComponent implements OnInit {
             this.openSnackBar("Some files weren't uploaded", "Close", "error")
           }
         },
-        err => {
-          
+        err => {        
           this.loading = false;
           this.shakeAnimation = 'invalid';
           this.openSnackBar("Server encountered an error", "Close", "error")
         }
-      );
-    
+      );  
   }
-
   //File Management
   clearValidFiles() {
-    this.toggleValidAnimation();
-    // this.form.get('document').setValue(null);
-    setTimeout(() => {
-      
-      for (let index = 0; index < this.fileNameList.length; index++) {
-        //if (this.isValidFileExtensionList[index] == true) {
-          
+    this.toggleValidAnimation();  
+    setTimeout(() => {    
+      for (let index = 0; index < this.fileNameList.length; index++) {      
           this.fileNameList.splice(index, 1);
-          //this.isValidFileExtensionList.splice(index, 1);
-          //this.fileExtensionList.splice(index, 1);
           this.fileList.splice(index, 1)
           this.form.get('document').setValue(this.fileList);
           index--;
-        //}
+        
       }      
       this.setGridSize()
 
@@ -200,18 +151,13 @@ export class FileUploadComponent implements OnInit {
   clearAllFiles() {
     this.toggleValidAnimation();
     this.toggleInvalidAnimation();
-   
-
     this.form.get('document').setValue(null);
     this.fileInput.nativeElement.value = '';
     this.valid = false;
-
-
     setTimeout(() => {
 
       this.fileNameList = [];
       this.fileList = [];
-     
       this.setGridSize()
     }, 499);
   }
@@ -221,17 +167,14 @@ export class FileUploadComponent implements OnInit {
     this.fileNameList.splice(index, 1);   
     this.fileList.splice(index, 1)
     this.form.get('document').setValue(this.fileList);
-   
     this.setGridSize()
-    if (this.fileNameList.length == 0) { this.valid = false; }
-    
+    if (this.fileNameList.length == 0) { this.valid = false; } 
   }
 
   getFileExtension(filename): string {
     return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
   }
 
-  
   //util pour les animations (pas encore implémenté)
   setGridSize(): string {
     this.gridSize = "";
@@ -245,8 +188,6 @@ export class FileUploadComponent implements OnInit {
     }
     return this.gridSize;
   }
-
-  
 
   //ANIMATIONS pas encore implémenté
   validFadeIn() {
