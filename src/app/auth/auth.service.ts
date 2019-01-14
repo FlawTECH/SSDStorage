@@ -33,6 +33,7 @@ export class AuthService {
         fullname,
         password,
         roles: ['admin'],
+        status,
         repeatPassword
       }).subscribe((data : any) => {
         observer.next({user: data.user});
