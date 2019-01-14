@@ -168,7 +168,7 @@ async function getFileListByUserId(req, res) {
     },
     { "$unwind": "$file" },
     { "$match": { "$and": [
-      decoded.roles.includes('admin')?{ "userId": new mongoose.Types.ObjectId(userid) }:'',
+      decoded.roles.includes('admin')?{}:{ "userId": new mongoose.Types.ObjectId(userid) },
       { "file.path": "/"+req.query.path },
       { "read": true }
     ]}}
