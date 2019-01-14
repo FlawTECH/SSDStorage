@@ -14,12 +14,51 @@ const FileSchema = Joi.object({
 
 module.exports = {
   insert,
-  deleteFile
+  deleteFile,
+  renameFile
 }
 
-function deleteFile(req, res) {
+function renameFile(req,res) {  // Receive fileId + newName
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
-  userid = decoded._id;
+  var userid = decoded._id;
+  req = req.body;
+  var newvalues = { $set: {name: req.newName } };
+  if(decoded.roles.indexOf('admin') == 0) { // Check if user is admin and ifso rename  file entries in DB + file in userDirectory
+    File.findByIdAndUpdate(req.fileId, newvalues,  function(err,file) {
+      if(err) throw err;
+      fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
+        if (err) {
+            return console.error(err);
+        }         
+        fs.rename(__dirname+"/../userDirectory/"+file.path+"/"+file.name, __dirname+"/../userDirectory/"+file.path+"/"+req.newName, function (err) {
+          if (err) throw err;
+          console.log('File ' +file.name +' renamed to: ' +req.newName);
+        })
+      });
+    });  
+  }else{
+    FilePermissions.findOne({fileId:req.fileId, userId:userid, write: true}).exec(function(err, filePerm){
+      if(Object.keys(filePerm).length !== 0){ // If query return something
+        File.findByIdAndUpdate(req.fileId, newvalues,  function(err,file) {
+          if(err) throw err;
+          fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
+            if (err) {
+                return console.error(err);
+            }         
+            fs.rename(__dirname+"/../userDirectory/"+file.path+"/"+file.name, __dirname+"/../userDirectory/"+file.path+"/"+req.newName, function (err) {
+              if (err) throw err;
+              console.log('File ' +file.name +' renamed to: ' +req.newName);
+            })
+          });
+        });  
+      }
+    });
+  }
+}
+
+function deleteFile(req, res) { // Receive fileId
+  var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
+  var userid = decoded._id;
   req = req.body;
   if(decoded.roles.indexOf('admin') == 0) { // Check if user is admin and ifso delete all filepermissions and file entries in DB + file in userDirectory
     FilePermissions.find({fileId:req.fileId}).remove().exec(function(err, filePerm){

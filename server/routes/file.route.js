@@ -27,19 +27,23 @@ router.route('/')
   .get(asyncHandler(getFileListByUserId));
 router.route('/delete')
   .put(asyncHandler(deleteFile));
+router.route('/rename')
+  .put(asyncHandler(renameFile));
 
 router.get('/download/:fileName', function(req, res){
     var file = __dirname + '/../userDirectory/'+req.params.fileName;
     res.download(file);
   });
 
+function renameFile(req,res) {
+  let renameFile = fileCtrl.renameFile(req);
+  res.json(renameFile);
+}
 
 function deleteFile(req,res) {
   let deleteFile = fileCtrl.deleteFile(req);
   res.json(deleteFile);
-
 }
-
 
 async function insert(req, res) {
   
@@ -142,8 +146,10 @@ async function insert(req, res) {
                 };
                 persmissionCtrl.insert(permissionToCreate).then(
                   permissionToCreate => {
-                    let craftedResponse = insertedFolder.toObject();
-                    res.json(craftedResponse);
+                    let craftedResponse = {
+                      'file': incomingFiles[0],
+                      'perm': permissionToCreate
+                    }
                   }
                 );
               });
@@ -183,8 +189,10 @@ async function insert(req, res) {
                   };
                   persmissionCtrl.insert(permissionToCreate).then(
                     permissionToCreate => {
-                      let craftedResponse = insertedFile.toObject();
-                      res.json(craftedResponse);
+                      let craftedResponse = {
+                        'file': incomingFiles[0],
+                        'perm': permissionToCreate
+                      }
                     }
                   );
                 });
@@ -192,6 +200,7 @@ async function insert(req, res) {
             );
           }
         }
+        res.json("OK");
       }
       else {
         //TODO throw error
@@ -220,8 +229,7 @@ async function getFileListByUserId(req, res) {
     { "$unwind": "$file" },
     { "$match": { "$and": [
       { "userId": new mongoose.Types.ObjectId(userid) },
-      { "file.path": req.query.path },
-      { "read": true }
+      { "file.path":"/"+req.query.path }
     ]}}
   ],
   function(err, resp) {
