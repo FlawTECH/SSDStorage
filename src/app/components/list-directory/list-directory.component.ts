@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input,OnChanges } from '@angular/core';
 import { FileService } from '../../services/file.service';
 import { File } from '../../class/file';
 import * as jwtDecode from 'jwt-decode';
@@ -10,18 +10,21 @@ import { tokenKey } from '@angular/core/src/view';
   templateUrl: './list-directory.component.html',
   styleUrls: ['./list-directory.component.scss']
 })
-export class ListDirectoryComponent implements OnInit {
+export class ListDirectoryComponent implements OnInit,OnChanges {
   private userFileList: File[] = [];
   private userFolderList : File[] = [];
-  private currentPath:String;
-  private token:any;
+  
+  private token = jwtDecode(localStorage.getItem("AuthToken"));
 
-  constructor(private fileService:FileService) {
-    this.token = jwtDecode(localStorage.getItem("AuthToken"));
-    
+  @Input()
+  public currentPath:String = this.token.fullname;
+
+  constructor(private fileService:FileService) {}
+  
+  ngOnChanges(changes){
+    console.log('Changed', changes.currentPath.currentValue, changes.currentPath.previousValue);
   }
   
-
   ngOnInit() {
     
     
@@ -29,18 +32,22 @@ export class ListDirectoryComponent implements OnInit {
     this.fileService.getFile(this.token.fullname).subscribe(
       (res) =>{
         //console.log(res);
-        res.forEach(element => {
-          console.log(element.file.type);
+        if(res){
+          res.forEach(element => {
+            console.log(element.file.type);
+            
+            if(element.file.type ==="f"){
+              this.userFileList.push(File.fromJSON(element.file));
+            }else{
+              this.userFolderList.push(File.fromJSON(element.file));
+            }
+          });
           
-          if(element.file.type ==="f"){
-            this.userFileList.push(File.fromJSON(element.file));
-          }else{
-            this.userFolderList.push(File.fromJSON(element.file));
-          }
-        });
-        console.log(res)
-        this.currentPath = this.userFileList[0].path+"/";
+          
+          //console.log(this.userFileList[0])
+        }
       }
+        
     )
   }
 
