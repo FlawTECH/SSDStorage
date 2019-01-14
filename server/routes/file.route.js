@@ -51,6 +51,7 @@ async function insert(req, res) {
   let FileModel = mongoose.model('File');
   let userId;
   let filePath;
+  let baseDir;
   let incomingFiles = [];
   let unzipFiles = false;
   
@@ -99,7 +100,8 @@ async function insert(req, res) {
       if(dbRes.length>0 || decoded.roles.includes("admin")) {
 
         //File can be written here
-        fs.ensureDirSync(__dirname+"/../userDirectory/"+filePath)
+        baseDir = __dirname+"/../userDirectory/"+filePath+(unzipFiles?"/"+incomingFiles[0].name.split('.').splice(0,incomingFiles[0].name.split('.').length-1).join('.'):"")
+        fs.ensureDirSync(baseDir);
 
         //Unzip if dir upload
         if(unzipFiles) {
@@ -109,16 +111,15 @@ async function insert(req, res) {
             zip.loadAsync(data).then(
               (contents) => {
                 Object.keys(contents.files).forEach(
-                  (zippedFileName) => {
+                  function(zippedFileName, i) {
                     if(zippedFileName.endsWith('/')) { // Is a directory
-                      zippedFileName = zippedFileName.substr(0, zippedFileName.length-1);
-                      var dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
-                      // createDirectory(dirPath)
+                      zippedFileName = zippedFileName.substr(0, zippedFileName.length-1).split('/')[zippedFileName.substr(0, zippedFileName.length-1).split('/').length-1];
+                      createDirectory(filePath, zippedFileName, baseDir, userId, res, unzipFiles, i == Object.keys(contents.files).length-1);
                     }
                     else {
                       zip.file(zippedFileName).async('nodebuffer').then( // Is a file
                         (unzippedFileConents) => {
-                          // fs.writeFileSync(dest, unzippedFileConents);
+                          // createFileFromZip(unzippedFileConents, zippedFileName, filePath, subDirPath, subDirName, userId, res, i == Object.keys(contents.files).length-1);
                         }
                       )
                     }
@@ -132,11 +133,11 @@ async function insert(req, res) {
           let dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
           let dirName = filePath.split('/').slice(filePath.split('/').length-1,filePath.split('/').length).join('');
 
-          createDirectory(dirPath, dirName, userId, res, true);
+          createDirectory(dirPath, dirName, filePath, userId, res, true);
         }
         else { // Upload files
           for(let i=0; i<incomingFiles.length; i++) {
-            createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, res, i==incomingFiles.length-1);
+            createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, res, unzipFiles, i==incomingFiles.length-1);
           }
         }
         res.json("OK");
@@ -178,12 +179,14 @@ async function getFileListByUserId(req, res) {
   });
 }
 
-function createDirectory(dirPath, dirName, userId, res, isFinal) {
+function createDirectory(dirPath, dirName, baseDir, userId, res, unzipFiles,isFinal) {
   let folder = {
     'name': dirName,
     'path': "/"+dirPath,
     'type': 'd'
   }
+
+  fs.ensureDirSync(baseDir+(unzipFiles?"/"+dirName:""));
 
   var folderId;
   fileCtrl.insert(folder).then(
@@ -257,4 +260,45 @@ function createFile(file, filePath, subdirPath, subdirName, userId, res, isFinal
       });
     }
   );
+}
+
+function createFileFromZip(file, fileName, filePath, subdirPath, subdirName, userId, res, isFinal) {
+  fs.writeFileSync( __dirname+"/../userDirectory/"+filePath+"/"+fileName, file);
+
+  //Adding perm to DB
+  let fileToUpload = {
+    'name': fileName,
+    'path': (subdirPath.length>0?"/":"")+subdirPath+"/"+subdirName,
+    'type': 'f'
+  };
+
+  var fileId;
+  fileCtrl.insert(fileToUpload).then(
+    insertedFile => {
+      fileToUpload = insertedFile;
+      Filedb.findOne({
+        name: fileToUpload.name
+      }, (err, dbRes) => {
+        fileId = dbRes._id;
+        fileToUpload = fileToUpload.toObject();
+
+        permissionToCreate = {
+          'fileId': fileId,
+          'userId': userId,
+          'read': true,
+          'write': true,
+          'delete': true,
+          'isOwner': true,
+        };
+        persmissionCtrl.insert(permissionToCreate).then(
+          permissionToCreate => {
+            if(isFinal) {
+              let craftedResponse = insertedFile.toObject();
+              res.json(craftedResponse);
+            }
+          }
+        );
+      });
+    }
+  ); 
 }
