@@ -195,7 +195,7 @@ async function insert(req, res) {
       }
       else {
         //TODO throw error
-        res.status(401).end(); return;
+        res.status(401).send("You are not allowed to do this here"); return;
       }
     });
   })
@@ -228,5 +228,3 @@ async function getFileListByUserId(req, res) {
     res.send(resp);
  });
 }
-
-
