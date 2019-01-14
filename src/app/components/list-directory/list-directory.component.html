@@ -1,30 +1,25 @@
-<mat-accordion class="example-headers-align">
-  <div>
-    <mat-list>
-      <h3 mat-subheader>Current path: {{currentPath}} </h3>
-      <mat-list-item *ngFor="let item of userFolderList; index as i">
-        <mat-icon mat-list-icon>folder</mat-icon>
-        <h4 mat-line>{{item.name}}</h4>
-        <p mat-line> {{item.createdAt | date}} </p>
-        <button mat-icon-button (click)="onClick" color="primary">
-          <mat-icon class="mat-18">visibility</mat-icon>
-        </button>
-      </mat-list-item>
+<div>
+  <mat-list>
+    <h3 mat-subheader>Current path: {{currentPath}} </h3>
+    <app-file-upload uploadType="uplt" [currentPath]="currentPath">
+    </app-file-upload>
+    <mat-list-item *ngFor="let item of userFolderList; index as i">
+      <mat-icon mat-list-icon>folder</mat-icon>
+      <h4 mat-line>{{item.name}}</h4>
+      <p mat-line> {{item.createdAt | date}} </p>
+      <button mat-icon-button (click)="onClick" color="primary">
+        <mat-icon class="mat-18">visibility</mat-icon>
+      </button>
+    </mat-list-item>
 
-      <mat-list-item *ngFor="let item of userFileList; index as i">
-        <mat-icon mat-list-icon>insert_drive_file</mat-icon>
-        <h4 mat-line>{{item.name}}</h4>
-        <p mat-line> {{item.createdAt | date}} </p>
-        <button mat-icon-button (click)="onClick" color="primary">
-          <mat-icon class="mat-18">cloud_download</mat-icon>
-        </button>
-      </mat-list-item>
+    <mat-list-item *ngFor="let item of userFileList; index as i">
+      <mat-icon mat-list-icon>insert_drive_file</mat-icon>
+      <h4 mat-line>{{item.name}}</h4>
+      <p mat-line> {{item.createdAt | date}} </p>
+      <button mat-icon-button (click)="onClick" color="primary">
+        <mat-icon class="mat-18">cloud_download</mat-icon>
+      </button>
+    </mat-list-item>
 
-    </mat-list>
-  </div>
-
-</mat-accordion>
-
-<app-file-upload>
-</app-file-upload>
-
+  </mat-list>
+</div>
