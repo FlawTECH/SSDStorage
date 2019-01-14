@@ -28,11 +28,11 @@ export class AuthService {
   }
 
   register(fullname : string,  password : string, repeatPassword : string, status: string = "Waiting") : Observable <any> {
-    const roles = []
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
         fullname,
         password,
+        roles: ['admin'],
         repeatPassword
       }).subscribe((data : any) => {
         observer.next({user: data.user});
