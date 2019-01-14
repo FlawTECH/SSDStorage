@@ -78,9 +78,6 @@ async function insert(req, res) {
     let subDirPath = filePath.split('/', filePath.split('/').length-subfolderCount).join('/');
     let subDirName = filePath.split('/').slice(filePath.split('/').length-subfolderCount,filePath.split('/').length-subfolderCount+1).join('');
 
-    console.log(subDirPath);
-    console.log(subDirName);
-
     //Checking if user has perm to write there
     FilePermissionsModel.aggregate([
       {
@@ -99,7 +96,7 @@ async function insert(req, res) {
         { "write": true }
       ]}}
     ]).count("authorizedCount").exec(function(err, dbRes) {
-      if(dbRes.length>0) {
+      if(dbRes.length>0 || decoded.roles.includes("admin")) {
 
         //File can be written here
         fs.ensureDirSync(__dirname+"/../userDirectory/"+filePath)
@@ -204,7 +201,7 @@ async function insert(req, res) {
       }
       else {
         //TODO throw error
-        res.status(401).end(); return;
+        res.status(401).send("You are not allowed to do this here"); return;
       }
     });
   })
@@ -217,6 +214,7 @@ async function getFileListByUserId(req, res) {
   let FileModel = mongoose.model('File');
   let FilePermissionsModel = mongoose.model('FilePermissions');
 
+  
   FilePermissionsModel.aggregate([
     {
       "$lookup": {
@@ -228,13 +226,17 @@ async function getFileListByUserId(req, res) {
     },
     { "$unwind": "$file" },
     { "$match": { "$and": [
+<<<<<<< HEAD
       { "userId": new mongoose.Types.ObjectId(userid) },
       { "file.path":"/"+req.query.path }
+=======
+      decoded.roles.includes('admin')?{ "userId": new mongoose.Types.ObjectId(userid) }:'',
+      { "file.path": "/"+req.query.path },
+      { "read": true }
+>>>>>>> fa5ab75283d143a57e40f10a1c62b407394bebe0
     ]}}
   ],
   function(err, resp) {
     res.send(resp);
- });
+  });
 }
-
-

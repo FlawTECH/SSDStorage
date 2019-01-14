@@ -16,6 +16,7 @@ const localLogin = new LocalStrategy({
   }
   user = user.toObject();
   delete user.hashedPassword;
+  console.log(user);
   done(null, user);
 });
 
