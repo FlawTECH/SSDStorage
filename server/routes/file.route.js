@@ -132,10 +132,8 @@ async function insert(req, res) {
                 };
                 persmissionCtrl.insert(permissionToCreate).then(
                   permissionToCreate => {
-                    let craftedResponse = {
-                      'file': incomingFiles[0],
-                      'perm': permissionToCreate
-                    }
+                    let craftedResponse = insertedFolder.toObject();
+                    res.json(craftedResponse);
                   }
                 );
               });
@@ -175,10 +173,8 @@ async function insert(req, res) {
                   };
                   persmissionCtrl.insert(permissionToCreate).then(
                     permissionToCreate => {
-                      let craftedResponse = {
-                        'file': incomingFiles[0],
-                        'perm': permissionToCreate
-                      }
+                      let craftedResponse = insertedFile.toObject();
+                      res.json(craftedResponse);
                     }
                   );
                 });
@@ -186,7 +182,6 @@ async function insert(req, res) {
             );
           }
         }
-        res.json("OK");
       }
       else {
         //TODO throw error
@@ -215,7 +210,8 @@ async function getFileListByUserId(req, res) {
     { "$unwind": "$file" },
     { "$match": { "$and": [
       { "userId": new mongoose.Types.ObjectId(userid) },
-      { "file.path": req.query.path }
+      { "file.path": req.query.path },
+      { "read": true }
     ]}}
   ],
   function(err, resp) {
