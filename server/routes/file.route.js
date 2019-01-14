@@ -27,19 +27,23 @@ router.route('/')
   .get(asyncHandler(getFileListByUserId));
 router.route('/delete')
   .put(asyncHandler(deleteFile));
+router.route('/rename')
+  .put(asyncHandler(renameFile));
 
 router.get('/download/:fileName', function(req, res){
     var file = __dirname + '/../userDirectory/'+req.params.fileName;
     res.download(file);
   });
 
+function renameFile(req,res) {
+  let renameFile = fileCtrl.renameFile(req);
+  res.json(renameFile);
+}
 
 function deleteFile(req,res) {
   let deleteFile = fileCtrl.deleteFile(req);
   res.json(deleteFile);
-
 }
-
 
 async function insert(req, res) {
   
@@ -135,6 +139,7 @@ async function insert(req, res) {
             createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, res, i==incomingFiles.length-1);
           }
         }
+        res.json("OK");
       }
       else {
         //TODO throw error

@@ -1,24 +1,16 @@
 <mat-accordion class="example-headers-align">
-
   <div>
-
     <mat-list>
       <h3 mat-subheader>Current path: {{currentPath}} </h3>
-      <mat-expansion-panel (opened)="fire()" *ngFor="let item of userFolderList; index as i">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{item.name}}
-          </mat-panel-title>
+      <mat-list-item *ngFor="let item of userFolderList; index as i">
+        <mat-icon mat-list-icon>folder</mat-icon>
+        <h4 mat-line>{{item.name}}</h4>
+        <p mat-line> {{item.createdAt | date}} </p>
+        <button mat-icon-button (click)="onClick" color="primary">
+          <mat-icon class="mat-18">visibility</mat-icon>
+        </button>
+      </mat-list-item>
 
-          <mat-panel-description class="example-headers-align">
-            <!--             created at: {{item.createdAt}}
-     --> type: {{item.type ==="f"? 'folder':'directory'}}
-          </mat-panel-description>
-          <mat-icon>folder</mat-icon>
-        </mat-expansion-panel-header>
-
-
-      </mat-expansion-panel>
       <mat-list-item *ngFor="let item of userFileList; index as i">
         <mat-icon mat-list-icon>insert_drive_file</mat-icon>
         <h4 mat-line>{{item.name}}</h4>
@@ -32,3 +24,7 @@
   </div>
 
 </mat-accordion>
+
+<app-file-upload>
+</app-file-upload>
+

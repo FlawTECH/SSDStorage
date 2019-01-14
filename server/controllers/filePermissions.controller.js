@@ -1,7 +1,6 @@
 const Joi = require('joi');
 const FilePermissions = require('../models/filePermissions.model');
 const jwtDecode = require("jwt-decode");
-const User = require('../models/user.model')
 const WrongFilePermissionsError = require('../errors').WrongPermissionsError
 
 
