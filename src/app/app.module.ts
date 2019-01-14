@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { AdminModule } from './admin/admin.module';
 import { AuthHeaderInterceptor } from './interceptors/header.interceptor';
 import { CatchErrorInterceptor } from './interceptors/http-error.interceptor';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { HeaderComponent } from './header/header.component';
@@ -37,6 +38,7 @@ import { ListDirectoryComponent } from './components/list-directory/list-directo
     AuthModule,
     AdminModule,
     AppRoutingModule,
+    MatGridListModule,
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,
