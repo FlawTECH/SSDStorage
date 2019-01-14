@@ -220,7 +220,7 @@ async function getFileListByUserId(req, res) {
     { "$unwind": "$file" },
     { "$match": { "$and": [
       { "userId": new mongoose.Types.ObjectId(userid) },
-      { "file.path": req.query.path },
+      { "file.path": "/"+req.query.path },
       { "read": true }
     ]}}
   ],
