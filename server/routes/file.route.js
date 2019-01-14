@@ -25,11 +25,21 @@ router.route('/')
   .post(asyncHandler(insert));
 router.route('/')
   .get(asyncHandler(getFileListByUserId));
+router.route('/delete')
+  .put(asyncHandler(deleteFile));
 
 router.get('/download/:fileName', function(req, res){
     var file = __dirname + '/../userDirectory/'+req.params.fileName;
     res.download(file);
   });
+
+
+function deleteFile(req,res) {
+  let deleteFile = fileCtrl.deleteFile(req);
+  res.json(deleteFile);
+
+}
+
 
 async function insert(req, res) {
   
@@ -218,3 +228,5 @@ async function getFileListByUserId(req, res) {
     res.send(resp);
  });
 }
+
+

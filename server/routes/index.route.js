@@ -1,7 +1,6 @@
 const express = require('express');
 const userRoutes = require('./user.route');
 const authRoutes = require('./auth.route');
-const userStateRoutes = require('./userState.route');
 const fileRoutes = require('./file.route');
 const fileGroupRoutes = require('./fileGroup.route');
 const filePermissionsRoutes = require('./filePermissions.route');
@@ -16,7 +15,6 @@ router.get('/health-check', (req, res) =>
 );
 router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
-router.use('/userState', userStateRoutes);
 router.use('/file', fileRoutes);
 router.use('/fileGroup', fileGroupRoutes);
 router.use('/filePermissions', filePermissionsRoutes);
