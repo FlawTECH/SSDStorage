@@ -1,4 +1,32 @@
-<form #form="ngForm" (ngSubmit)="uploadFiles();">
+<!-- <form #form="ngForm" (ngSubmit)="uploadFiles();">
   <input type="file" name="picked_files" ([(ngModel)])="this.pickedFile" />
   <input type="submit" name="submit" value="Upload" />
-</form>
+</form> -->
+
+<div>
+  <form #form="ngForm" (ngSubmit)="uploadFiles();">
+
+
+
+
+    <button matTooltip="tooltip" matTooltipShowDelay="1000" id="test" type="button" color="primary" mat-mini-fab
+      (click)="fileInput.click()">
+      <mat-icon>attachment</mat-icon>
+    </button>
+
+
+
+    <mat-list>
+      <mat-list-item class="">
+        <mat-icon style="cursor:pointer" color="accent" matTooltip="tooltip" matTooltipShowDelay="500"
+          matTooltipPosition="before">info_outline</mat-icon>
+        <b style="cursor: grab;" [ngStyle]="">filename</b>
+
+        <mat-icon style="cursor:pointer" color="accent" matTooltip="Remove this file" matTooltipShowDelay="500"
+          matTooltipPosition="after">clear</mat-icon>
+      </mat-list-item>
+    </mat-list>
+
+    <input #fileInput hidden id="document" type="file" (change)="onFileChange($event) " required multiple />
+  </form>
+</div>
