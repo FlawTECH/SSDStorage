@@ -103,7 +103,7 @@ async function insert(req, res) {
         { "file.type": "d" },
         { "write": true }
       ]}}
-    ]).count("authorizedCount").exec(async function(err, dbRes) {
+    ]).count("authorizedCount").exec(function(err, dbRes) {
       if(dbRes.length>0 || decoded.roles.includes("admin")) {
         let allFilesCreated = [];
 
@@ -112,13 +112,13 @@ async function insert(req, res) {
 
         // Subfolder based on zip file name
         if(unzipFiles) {
-          allFilesCreated.push(createDirectory(
+          createDirectory(
             filePath,
             baseDir.split('/').splice(baseDir.split('/').length-1, 1).join('/'),
             __dirname+"/../userDirectory/"+filePath,
             userId,
             unzipFiles
-          ));
+          );
         }
 
         //Unzip if dir upload
@@ -136,12 +136,12 @@ async function insert(req, res) {
                       var destPath = filePath+"/"+zippedFileName.split('/').splice(0,zippedFileName.split('/').length-1).join('/');
                       if(destPath.endsWith('/')) { destPath = destPath.substr(0, destPath.length-1); }
                       zippedFileName = zippedFileName.split('/')[zippedFileName.split('/').length-1];
-                      allFilesCreated.push(createDirectory(destPath, zippedFileName, baseDir, userId, unzipFiles));
+                      createDirectory(destPath, zippedFileName, baseDir, userId, unzipFiles);
                     }
                     else {
                       zip.file(zippedFileName).async('nodebuffer').then( // Is a file
                         (unzippedFileContents) => {
-                          allFilesCreated.push(createFileFromZip(unzippedFileContents, zippedFileName, baseDir, subDirPath, subDirName, userId));
+                          createFileFromZip(unzippedFileContents, zippedFileName, baseDir, subDirPath, subDirName, userId);
                         }
                       )
                     }
@@ -155,11 +155,11 @@ async function insert(req, res) {
           let dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
           let dirName = filePath.split('/').slice(filePath.split('/').length-1,filePath.split('/').length).join('');
 
-          allFilesCreated.push(createDirectory(dirPath, dirName, filePath, userId));
+          createDirectory(dirPath, dirName, baseDir, userId, unzipFiles);
         }
         else { // Upload files
           for(let i=0; i<incomingFiles.length; i++) {
-            allFilesCreated.push(await createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId));
+            createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId);
           }
         }
         console.log(allFilesCreated);
@@ -213,6 +213,7 @@ function createDirectory(dirPath, dirName, baseDir, userId, unzipFiles) {
   if(unzipFiles) {
     dirPath = dirPath.split('/').splice(1, dirPath.split('/').length-1).join('/');
   }
+
   fs.ensureDirSync(baseDir+(unzipFiles?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""));
 
   var folderId;
