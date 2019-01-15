@@ -4,12 +4,10 @@ const User = require('../models/user.model');
 const fileCtrl = require('../controllers/file.controller');
 const permissionsCtrl = require('../controllers/filePermissions.controller');
 const WrongStatusError = require('../errors').WrongStatusError
-const fs = require('fs');
-
 
 const userSchema = Joi.object({
   fullname: Joi.string().required(),
-  status: Joi.string().required().regex(/^Waiting$|^Active$|^Deleted$|^Deactivated$/),
+  status: Joi.string().required().regex(/^Waiting$/),
   password: Joi.string().required(),
   repeatPassword: Joi.string().required().valid(Joi.ref('password')),
   roles: Joi.array().required(),
@@ -23,58 +21,56 @@ const states = {
 }
 
 async function insert(user) {
-  console.log(user)
-  if (user.roles.indexOf('admin') > -1 && user.status !== "Active")
-    throw new WrongStatusError ('An admin must be active when registering')
   if (user.roles.indexOf('admin') < 0 && user.status !== "Waiting")
     throw new WrongStatusError ('A user must be waiting when registering')
-  // user = await Joi.validate(user, userSchema, { abortEarly: false });
-  // user.hashedPassword = bcrypt.hashSync(user.password, 10);
-  // delete user.password;
-  // await UserState.findOne({name: 'DISABLED'}, async function(err, res) {
-  //   user.stateId = res._id;
-  //   console.log(res);
-  //   // dbUser.stateId.push(res);
-  // });
-  // return await new User(user).save();
+
   user = await Joi.validate(user, userSchema, { abortEarly: false });
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
   return await new User(user).save();
 }
 
-function setStatus(id, newStatus, callback) {
-  User.findById(id, (err, doc) => {
-    if (err || !doc) {
-      return callback (err, doc)
-    }
+async function setStatus(user) {
+  let userDb
+  
+  try {
+    userDb = await User.findById(user._id)
+  } catch (e) {
+    e.message = "You are trying to change the status of a user that does not exist"
+    throw e
+  }
+  
+  const newStatus = user.newStatus;
+  
+  if (Object.values(states).indexOf(newStatus) < 0) 
+    throw new WrongStatusError('Status does not exist')
 
-    if (Object.values(states).indexOf(newStatus) < 0) {
-      return callback(new WrongStatusError ('Status does not exist'), null)
-    }
+  if (userDb.roles.indexOf('admin') > -1) 
+    throw new WrongStatusError('An admin can not change the status of another admin')
 
-    if (doc.roles.indexOf('admin') > -1) {
-      return callback(new WrongStatusError ('An admin can not change the status of another admin'), null)
-    }
+  if (userDb.status == states.DELETED)
+    throw new WrongStatusError('A deleted user can not change status')
 
-    if (doc.status == states.DELETED) {
-      return callback(new WrongStatusError('A deleted user can not change status'), null)
-    }
+  if (newStatus == states.WAITING)
+    throw new WrongStatusError ('A user can not go back to waiting status')
+  
+  if (userDb.status == states.WAITING && newStatus == states.DEACTIVATED)
+    throw new WrongStatusError ('You can not deactivate a user who is not active')
 
-    if (newStatus == states.WAITING) {
-      return callback(new WrongStatusError ('A user can not go back to waiting status'), null)
-    }
-    
-    if (doc.status == states.WAITING && newStatus != states.ACTIVE) {
-      return callback(new WrongStatusError ('You can not deactivate a user who is not active'), null)
-    }
-    
-    User.updateOne(doc, {'status': newStatus}, (err, doc) => {
-      callback(err, doc)
-    })
+  if (! await User.updateOne(userDb, {'status': newStatus}))
+    throw new Error("Update Error")
+
     createDirectory(doc);
     initDefaultPermissions(doc);
-  })
+}
+
+async function getAllNonActive() {
+  return await User.find(
+    { $and: [
+      { $or: [{ status: "Waiting" }, { status: "Active" }, {status: "Deactivated"}] },
+      { roles: {$nin: ['admin']} }
+    ]}, 
+    { fullname: 1, status: 1, });
 }
 
 function createDirectory(doc) {
@@ -113,5 +109,6 @@ function initDefaultPermissions(doc) {
 
 module.exports = {
   insert,
-  setStatus
+  setStatus,
+  getAllNonActive
 }

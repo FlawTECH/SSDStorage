@@ -15,12 +15,7 @@ const routes: Routes = [{
 }, {
   path: 'auth',
   loadChildren: 'app/auth/auth.module#AuthModule',
-  
 }, {
-  path: 'admin',
-  loadChildren: 'app/admin/admin.module#AdminModule'
-},
-{
   path:'manager',
   component: ManagerComponent,
   canActivate:[OpenGuard],
@@ -28,8 +23,7 @@ const routes: Routes = [{
     path:'',
     redirectTo:"directories",
     pathMatch:'full'
-  }, 
-  {
+  }, {
     path:'directories',
     component:ListDirectoryComponent,
   },

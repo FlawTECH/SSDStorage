@@ -22,16 +22,6 @@ const UserSchema = new mongoose.Schema({
   roles: [{
     type: String
   }]
-  // stateId: {
-  //   type: mongoose.SchemaTypes.ObjectId,
-  //   ref: 'UserState',
-  //   required: true
-  // },
-  // isAdmin: {
-  //   type: Boolean,
-  //   required: true,
-  //   default: false
-  // }
 }, {
   versionKey: false
 });
