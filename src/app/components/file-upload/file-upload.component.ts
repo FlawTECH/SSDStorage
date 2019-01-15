@@ -130,20 +130,29 @@ export class FileUploadComponent implements OnInit {
      
       const request = this.fileService.postFile(formModel).subscribe(
         result => {
-          this.getfile(this.token.fullname);
-          if (result == "OK") {
-            this.loading = false;         
-            this.openSnackBar("All files were uploaded with success!", "Close", "success");
-            this.clearValidFiles();
-            this.valid = false
-          } else {
+          //this.getfile(this.token.fullname);
+          
+          if (result.message == "Success") {
+            result.files.forEach(element => {
+              if(element.perm.read == true){
+                this.listDirectoryComponent.userFileList.push(File.fromJSON(element.file));
+                this.loading = false;         
+                this.openSnackBar("All files were uploaded with success!", "Close", "success");
+                this.clearValidFiles();
+                this.valid = false;
+              }
+            });
+            
+
+          } else if(result.message == "Error") {
             this.loading = false;
             //this.shakeAnimation = 'invalid';
             this.clearValidFiles();
             this.openSnackBar("Some files weren't uploaded", "Close", "error")
           }
         },
-        err => {        
+        err => {
+          console.log(err);        
           this.loading = false;
           this.shakeAnimation = 'invalid';
           this.openSnackBar("Server encountered an error", "Close", "error")
@@ -155,10 +164,26 @@ export class FileUploadComponent implements OnInit {
       if(this.desiredNewFolderName != ""){
         const request = this.fileService.postFolder(formModel).subscribe(
           result => {
-            this.loading = false;
-            this.openSnackBar("Folder created with success!", "Close", "success");
-            this.desiredNewFolderName = "";
-            this.getfile(this.token.fullname);
+            
+            if (result.message == "Success") {
+              result.files.forEach(element => {
+                if(element.perm.read == true){
+                  this.listDirectoryComponent.userFolderList.push(File.fromJSON(element.file));
+                  this.loading = false;         
+                  this.openSnackBar("Folder uploaded with success!", "Close", "success");
+                  this.clearValidFiles();
+                  this.valid = false;
+                }
+              });
+              
+  
+            } else if(result.message == "Error") {
+              this.loading = false;
+              //this.shakeAnimation = 'invalid';
+              this.clearValidFiles();
+              this.openSnackBar("Error while oploading your folder", "Close", "error")
+            }
+            
 
           }
         )
@@ -183,10 +208,10 @@ export class FileUploadComponent implements OnInit {
           res.forEach(element => {
             console.log(element.file.type);
             
-            if(element.file.type ==="f"){
+            if(element.file.type ==="f" && element.read == true){
               
               this.listDirectoryComponent.userFileList.push(File.fromJSON(element.file));
-            }else{
+            }else if (element.file.type == "d" && element.read == true ){
               
               this.listDirectoryComponent.userFolderList.push(File.fromJSON(element.file));
             }

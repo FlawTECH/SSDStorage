@@ -36,9 +36,10 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
           res.forEach(element => {
             console.log(element.file.type);
             
-            if(element.file.type ==="f"){
+            if(element.file.type ==="f" && element.read == true){
+              
               this.userFileList.push(File.fromJSON(element.file));
-            }else{
+            }else if (element.file.type == "d" && element.read == true ){
               this.userFolderList.push(File.fromJSON(element.file));
             }
           });
@@ -51,6 +52,8 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
     )
   }
 
-  
+  clickDirectory(){
+
+  }
 
 }
