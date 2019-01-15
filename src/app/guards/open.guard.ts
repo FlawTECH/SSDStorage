@@ -18,7 +18,7 @@ export class OpenGuard implements CanActivate {
       var decoded = jwtDecode(localStorage.getItem("AuthToken"));
       
       if(decoded.status == "Active"){
-        
+        return true;
 
       }else if(decoded.status == "Waiting"){
         this.router.navigate(['/waiting'])
