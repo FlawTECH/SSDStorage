@@ -32,6 +32,7 @@ router.route('/rename')
 router.route('/move')
   .put(asyncHandler(moveFile));
 
+
 router.get('/download/:fileName', function(req, res){
     var file = __dirname + '/../userDirectory/'+req.params.fileName;
     res.download(file);

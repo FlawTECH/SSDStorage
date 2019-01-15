@@ -45,17 +45,13 @@ function moveFile(req,res) {  // Receive FileObject with new path
           req.path = req.path.slice(0,-1);
         }
         lastDirectory = req.path.split("/");
-        console.log("1: "+lastDirectory)
         if(lastDirectory != decoded.fullname){
           lastDirectory = lastDirectory[lastDirectory.length-1];
           pathLastDirectory = req.path.slice(0,-lastDirectory.length-1);
         }else{
           pathLastDirectory = "/";
         }
-        
-        console.log("2: "+pathLastDirectory)
         File.findOne({name:lastDirectory, path:pathLastDirectory}).exec(function(err, fileInfo){
-          console.log("3: "+fileInfo)
           if(Object.keys(fileInfo).length !== 0){
             fileid = fileInfo._id;
             FilePermissions.findOne({fileId:fileid, userId:userid, write: true}).exec(function(err, filePermLastDirectory){
@@ -143,6 +139,10 @@ function deleteFile(req, res) { // Receive fileId
             fs.unlink(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
                   if(err) return console.log(err);
                   console.log('file deleted successfully!');
+                  var finalResponse = Object.assign({
+                    'message': "Success"
+                  });
+                  return finalResponse;
             });  
           });
         });

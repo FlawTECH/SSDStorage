@@ -10,7 +10,14 @@ router.use(passport.authenticate('jwt', { session: false }))
 
 router.route('/')
   .post(asyncHandler(insert));
+router.route('/treshold')
+  .post(asyncHandler(treshold));
 
+
+function treshold(req,res) {
+  let treshold = fileGroupCtl.treshold(req.body);
+  res.json(treshold);
+}
 
 async function insert(req, res) {
   let fileGroup = await fileGroupCtl.insert(req.body);
