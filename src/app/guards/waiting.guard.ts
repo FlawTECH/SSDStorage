@@ -1,42 +1,28 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { MatSnackBar } from '@angular/material';
 import * as jwtDecode from "jwt-decode";
+import { MatSnackBar } from '@angular/material';
 
 @Injectable({
   providedIn: 'root'
 })
-export class OpenGuard implements CanActivate {
-  constructor(private router: Router, public snackBar: MatSnackBar) {
-
-  }
+export class WaitingGuard implements CanActivate {
+  constructor(private router: Router, public snackBar: MatSnackBar) {}
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     if (localStorage.getItem("AuthToken")) {
       var decoded = jwtDecode(localStorage.getItem("AuthToken"));
-      
-      if(decoded.status == "Active"){
+      if(decoded.status == "Waiting"){
         return true;
-
-      }else if(decoded.status == "Waiting"){
-        this.router.navigate(['/waiting'])
-        this.snackBar.open("Your account need to be verified", "Close", {
+      }else{
+        this.snackBar.open("You don't have permission to access this page!", "Close", {
           duration: 4000,
         })
         return false;
-      }else{
-        return false;
       }
-    }else {
-      this.router.navigate(['/auth/login']);
-      this.snackBar.open("Please login first", "Close", {
-        duration: 2000,
-      })
 
-      return false;
     }
-
   }
 }

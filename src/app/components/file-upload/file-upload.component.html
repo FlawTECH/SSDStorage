@@ -2,7 +2,15 @@
 
 
   <mat-card-title-group>
-    <mat-card-title style="text-align: center">Upload a file
+    <mat-card-title style="text-align: center">
+      <mat-form-field>
+
+        <mat-select placeholder="upload type" [(value)]="selectedUploadType">
+          <mat-option default value="file">file</mat-option>
+          <mat-option value="folder">folder</mat-option>
+        </mat-select>
+
+      </mat-form-field>
     </mat-card-title>
     <!-- <mat-card-subtitle>Subtitle</mat-card-subtitle> -->
   </mat-card-title-group>
@@ -17,23 +25,50 @@
 
 
         <mat-grid-tile [colspan]="1" [rowspan]="">
-          <button mat-raised-button matTooltip="docx/doc/xls/xlsx/ppt/pptx/pdf" matTooltipShowDelay="1000" id="test"
-            type="button" color="primary" (click)="fileInput.click()">
-            <mat-icon>attachment</mat-icon>
-          </button>
+          <div *ngIf="selectedUploadType=='file'; then fileUpload"></div>
+          <ng-template #fileUpload>
+            <button mat-raised-button matTooltip="tooltip" matTooltipShowDelay="1000" id="test" type="button" color="primary"
+              (click)="fileInput.click()">
+              <mat-icon>attachment</mat-icon>
+            </button>
+          </ng-template>
+
+          <!-- <div *ngIf="selected=='folder'; then folderUpload "></div>
+          <ng-template #folderUpload>
+            <button mat-raised-button matTooltip="tooltip" matTooltipShowDelay="1000" id="test" type="button" color="primary"
+              (click)="fileInput.click()">
+              <mat-icon>create_new_folder</mat-icon>
+            </button>
+          </ng-template> -->
+
         </mat-grid-tile>
-        <mat-grid-tile [colspan]="1" [rowspan]="">
 
-          <mat-list>
-            <mat-list-item class="" *ngFor="let fileName of fileNameList;index as i">
+        <div *ngIf="selectedUploadType=='file'; then fileUploadDescr"></div>
+        <ng-template #fileUploadDescr>
+          <mat-grid-tile [colspan]="1" [rowspan]="">
 
-              <b style="cursor: grab;">{{fileName}}</b>
+            <mat-list>
+              <mat-list-item class="" *ngFor="let fileName of fileNameList;index as i">
 
-              <mat-icon (click)="clearCheckedFile(i)" style="cursor:pointer" color="accent" matTooltip="Remove this file"
-                matTooltipShowDelay="500" matTooltipPosition="after">clear</mat-icon>
-            </mat-list-item>
-          </mat-list>
-        </mat-grid-tile>
+                <b style="cursor: grab;">{{fileName}}</b>
+
+                <mat-icon (click)="clearCheckedFile(i)" style="cursor:pointer" color="accent" matTooltip="Remove this file"
+                  matTooltipShowDelay="500" matTooltipPosition="after">clear</mat-icon>
+              </mat-list-item>
+            </mat-list>
+          </mat-grid-tile>
+        </ng-template>
+
+        <div *ngIf="selectedUploadType=='folder'; then folderUploadDescr "></div>
+        <ng-template #folderUploadDescr>
+          <mat-grid-tile [colspan]="1" [rowspan]="">
+            <mat-form-field>
+              <input name="desiredNewFolderName" matInput [(ngModel)]="desiredNewFolderName" placeholder="folder name" required>
+            </mat-form-field>
+          </mat-grid-tile>
+
+        </ng-template>
+
 
 
       </mat-grid-list>
@@ -49,15 +84,19 @@
       <mat-grid-list cols="4" rowHeight="50">
         <mat-grid-tile></mat-grid-tile>
         <mat-grid-tile>
-          <button #cancelUpload type="submit" mat-raised-button [disabled]="!valid">
+          <button *ngIf="selectedUploadType =='file'" #cancelUpload type="submit" mat-raised-button [disabled]="!valid">
             <mat-icon>cloud_upload</mat-icon> Upload
 
+          </button>
+          <button *ngIf="selectedUploadType =='folder'" #cancelUpload type="submit" mat-raised-button>
+            <mat-icon>create_new_folder</mat-icon> Create folder
+  
           </button>
         </mat-grid-tile>
 
         <mat-grid-tile>
-          <button *ngIf="loading==false; else cancel_upload" type="button" mat-raised-button [disabled]="!valid"
-            (click)="clearAllFiles()">
+          <button *ngIf="loading==false && selectedUploadType =='file'; else cancel_upload" type="button" mat-raised-button [disabled]="!valid"
+            (click)="clearAllFiles()" >
             <mat-icon>delete</mat-icon> Remove
           </button>
 

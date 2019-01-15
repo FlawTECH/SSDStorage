@@ -6,6 +6,7 @@ import { Subject } from 'rxjs/Subject';
 import { TokenStorage } from './token.storage';
 import { TooltipComponent } from '@angular/material';
 
+
 @Injectable()
 export class AuthService {
 
@@ -28,13 +29,14 @@ export class AuthService {
   }
 
   register(fullname : string,  password : string, repeatPassword : string, status: string = "Waiting") : Observable <any> {
-    const roles = []
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
         fullname,
         status,
         roles,
         password,
+        roles: [],
+        status,
         repeatPassword
       }).subscribe((data : any) => {
         observer.next({user: data.user});
@@ -47,13 +49,12 @@ export class AuthService {
 
   setUser(user): void {
     if (user){
-      //user.isAdmin = (user.roles.indexOf('admin') > -1);
-      user.isAdmin = (user.isAdmin == false);
-
+      user.isAdmin = (user.roles.indexOf('admin') > -1);
     }
     
     this.$userSource.next(user);
     (<any>window).user = user;
+    console.log("setuser", (<any>window).user)
   }
 
   getUser(): Observable<any> {

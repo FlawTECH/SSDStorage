@@ -5,6 +5,8 @@ import { FileService } from '../../services/file.service';
 import * as jwtDecode from 'jwt-decode';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { User } from '../../class/user';
+import { ListDirectoryComponent } from '../list-directory/list-directory.component';
+import { File } from '../../class/file';
 
 @Component({
   selector: 'app-file-upload',
@@ -18,6 +20,8 @@ export class FileUploadComponent implements OnInit {
   @Input()
   private currentPath:String;
 
+  private selectedUploadType;
+  private token;
   form: FormGroup;
   loading: boolean = false;
   valid: boolean = false;
@@ -30,10 +34,11 @@ export class FileUploadComponent implements OnInit {
   private user:User;
   private fileList = [];
   private fileNameList: string[];
+  private desiredNewFolderName:String;
   private gridSize: string = "75px";
   @ViewChild('fileInput') fileInput: ElementRef;
 
-  constructor(private fb: FormBuilder, private fileService: FileService, public snackBar: MatSnackBar) {
+  constructor(private fb: FormBuilder, private fileService: FileService, public snackBar: MatSnackBar, private listDirectoryComponent: ListDirectoryComponent) {
     this.user = new User("",[]);
     this.createForm();
   }
@@ -46,7 +51,9 @@ export class FileUploadComponent implements OnInit {
     this.fileNameValidFade = "fadeOut";
     this.fileNameInvalidFade = "fadeOut";
     this.fileNameList = [];  
-    this.gridSize = "75px";  
+    this.gridSize = "75px";
+    this.desiredNewFolderName="";  
+    this.token = this.listDirectoryComponent.token;
   }
 
   openSnackBar(message: string, action: string, type?: string) {
@@ -65,6 +72,11 @@ export class FileUploadComponent implements OnInit {
     this.form = this.fb.group({
       document: null
     });
+  }
+
+  onFolderNameChange(event){
+    console.log(event);
+    
   }
 
   onFileChange(event) {
@@ -98,22 +110,30 @@ export class FileUploadComponent implements OnInit {
 
   prepareSave(): any {
     let input = new FormData();
-    for (let index = 0; index < this.form.get('document').value.length; index++) {     
-      input.append('document', this.form.get('document').value[index]);
+    if(this.selectedUploadType=="file"){
+      for (let index = 0; index < this.form.get('document').value.length; index++) {     
+        input.append('document', this.form.get('document').value[index]);
+      }
+      input.append("path",this.currentPath.toString())
+    }else if (this.selectedUploadType == "folder"){
+      input.append("path",this.currentPath.toString()+"/"+this.desiredNewFolderName)
     }
-    input.append("path",this.currentPath.toString())
+    
     return input;
   }
 
   onSubmit() {
     this.loading = true;
-    const formModel = this.prepareSave();    
-      console.log(this.user)
-      const request = this.fileService.postFile(formModel,this.currentPath).subscribe(
+    const formModel = this.prepareSave();   
+    
+    if(this.selectedUploadType == "file"){
+     
+      const request = this.fileService.postFile(formModel).subscribe(
         result => {
+          this.getfile(this.token.fullname);
           if (result == "OK") {
             this.loading = false;         
-            this.openSnackBar("All files were uploaded with succes!", "Close", "success");
+            this.openSnackBar("All files were uploaded with success!", "Close", "success");
             this.clearValidFiles();
             this.valid = false
           } else {
@@ -129,6 +149,55 @@ export class FileUploadComponent implements OnInit {
           this.openSnackBar("Server encountered an error", "Close", "error")
         }
       );  
+    }else if(this.selectedUploadType == "folder"){
+      
+      
+      if(this.desiredNewFolderName != ""){
+        const request = this.fileService.postFolder(formModel).subscribe(
+          result => {
+            this.loading = false;
+            this.openSnackBar("Folder created with success!", "Close", "success");
+            this.desiredNewFolderName = "";
+            this.getfile(this.token.fullname);
+
+          }
+        )
+      }else {
+        
+        
+        this.openSnackBar("please enter a folder name", "Close", "error");
+        this.loading = false;
+        }
+        
+      }
+      
+  }
+
+  getfile(username){
+    this.fileService.getFile(username).subscribe(
+      (res) =>{
+        //console.log(res);
+        if(res){
+          this.listDirectoryComponent.userFileList = [];
+          this.listDirectoryComponent.userFolderList = [];
+          res.forEach(element => {
+            console.log(element.file.type);
+            
+            if(element.file.type ==="f"){
+              
+              this.listDirectoryComponent.userFileList.push(File.fromJSON(element.file));
+            }else{
+              
+              this.listDirectoryComponent.userFolderList.push(File.fromJSON(element.file));
+            }
+          });
+          
+          
+          //console.log(this.userFileList[0])
+        }
+      }
+        
+    )
   }
   //File Management
   clearValidFiles() {

@@ -1,1 +1,16 @@
-<h4>HELLO FROM ADMIN PAGE</h4>
+<mat-list role="list" id="status-list">
+    <form (ngSubmit)="onSubmit()" #userStatusForm="ngForm">
+        <mat-list-item role="listitem" *ngFor="let user of users">
+            <div class="fullname">Pseudo : {{user.fullname}}</div>
+            <div class="status">Status : {{user.status}}</div>
+            <mat-form-field>
+                <mat-select placeholder="Status" [(value)]="user.status">
+                    <mat-option [(ngModel)]="user.status" ngDefaultControl value="Active" name="Active">Active</mat-option>
+                    <mat-option [(ngModel)]="user.status" ngDefaultControl value="Deactivated" name="Deactivated">Deactivated</mat-option>
+                    <mat-option [(ngModel)]="user.status" ngDefaultControl value="Deleted" name="Deleted">Deleted</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </mat-list-item>
+        <button mat-raised-button type="submit">Validate</button>
+    </form>
+</mat-list>

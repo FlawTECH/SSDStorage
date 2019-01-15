@@ -16,27 +16,14 @@ export class IsLoggedInGuard implements CanActivate {
     if(localStorage.getItem("AuthToken")){
 
         var decoded = jwtDecode(localStorage.getItem("AuthToken"));
-        console.log(decoded)
-        var role = ""
         this.snackBar.open("You are already logged in as : "+decoded.fullname,"Close",{
           duration: 2000,
-          
         },)
-
         //TODO redirection à partir du ROLE
-        
         this.router.navigate(['/manager/directories'])
          return false;
-        
-        
-
-        
-
-      }else{
-
-
+      } else {
         return true;
-
       }  
   }
 }
