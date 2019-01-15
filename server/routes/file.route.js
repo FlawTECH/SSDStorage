@@ -29,11 +29,18 @@ router.route('/delete')
   .put(asyncHandler(deleteFile));
 router.route('/rename')
   .put(asyncHandler(renameFile));
+router.route('/move')
+  .put(asyncHandler(moveFile));
 
 router.get('/download/:fileName', function(req, res){
     var file = __dirname + '/../userDirectory/'+req.params.fileName;
     res.download(file);
   });
+
+function moveFile(req,res) {
+  let moveFile = fileCtrl.moveFile(req);
+  res.json(moveFile);
+}
 
 function renameFile(req,res) {
   let renameFile = fileCtrl.renameFile(req);
