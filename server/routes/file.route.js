@@ -106,72 +106,88 @@ async function insert(req, res) {
     ]).count("authorizedCount").exec(async function(err, dbRes) {
       if(dbRes.length>0 || decoded.roles.includes("admin")) {
         let promises = [];
+        let workDone;
 
         //File can be written here
         baseDir = __dirname+"/../userDirectory/"+filePath+(unzipFiles?"/"+incomingFiles[0].name.split('.').splice(0,incomingFiles[0].name.split('.').length-1).join('.'):"")
 
         // Subfolder based on zip file name
-        if(unzipFiles) {
-          promises.push(new Promise(function(resolve, reject) {createDirectory(
-            filePath,
-            baseDir.split('/').splice(baseDir.split('/').length-1, 1).join('/'),
-            __dirname+"/../userDirectory/"+filePath,
-            userId,
-            unzipFiles,
-            resolve
-          );}));
-        }
+        // if(unzipFiles) {
+        //   promises.push(new Promise(function(resolve, reject) {createDirectory(
+        //     filePath,
+        //     baseDir.split('/').splice(baseDir.split('/').length-1, 1).join('/'),
+        //     __dirname+"/../userDirectory/"+filePath,
+        //     userId,
+        //     unzipFiles,
+        //     resolve
+        //   );}));
+        // }
 
         //Unzip if dir upload
         if(unzipFiles) {
-          fs.readFile(incomingFiles[0].path, function(err, data) {
-            if(err) throw err;
-            let zip = new jszip();
-            zip.loadAsync(data).then(
-              (contents) => {
-                Object.keys(contents.files).forEach(
-                  function(zippedFileName, i) {
-                    if(zippedFileName.endsWith('/')) { // Is a directory
-                      //Fixing filename for creating dirs
-                      zippedFileName = zippedFileName.substr(0,zippedFileName.length-1);
-                      var destPath = filePath+"/"+zippedFileName.split('/').splice(0,zippedFileName.split('/').length-1).join('/');
-                      if(destPath.endsWith('/')) { destPath = destPath.substr(0, destPath.length-1); }
-                      zippedFileName = zippedFileName.split('/')[zippedFileName.split('/').length-1];
-                      promises.push(new Promise(function(resolve,reject) {createDirectory(destPath, zippedFileName, baseDir, userId, unzipFiles, resolve); }));
-                    }
-                    else {
-                      zip.file(zippedFileName).async('nodebuffer').then( // Is a file
-                        (unzippedFileContents) => {
-                          promises.push(new Promise(function(resolve, reject) { createFileFromZip(unzippedFileContents, zippedFileName, baseDir, subDirPath, subDirName, userId, resolve);}));
+          workDone = new Promise(function(resolveParent, reject){
+            fs.readFile(incomingFiles[0].path, function(err, data) {
+              if(err) throw err;
+              let zip = new jszip();
+              zip.loadAsync(data).then(
+                (contents) => {
+                  Object.keys(contents.files).forEach(
+                    function(zippedFileName, i) {
+                      if(zippedFileName.endsWith('/')) { // Is a directory
+                        //Fixing filename for creating dirs
+                        zippedFileName = zippedFileName.substr(0,zippedFileName.length-1);
+                        var destPath = filePath+"/"+zippedFileName.split('/').splice(0,zippedFileName.split('/').length-1).join('/');
+                        if(destPath.endsWith('/')) { destPath = destPath.substr(0, destPath.length-1); }
+                        zippedFileName = zippedFileName.split('/')[zippedFileName.split('/').length-1];
+                        promises.push(new Promise(function(resolve,reject) { createDirectory(destPath, zippedFileName, baseDir, userId, unzipFiles, resolve); }));
+                        if(i == Object.keys(contents.files).length-1) {
+                          resolveParent(0);
                         }
-                      )
+                      }
+                      else {
+                        zip.file(zippedFileName).async('nodebuffer').then( // Is a file
+                          (unzippedFileContents) => {
+                            promises.push(new Promise(function(resolve, reject) { createFileFromZip(unzippedFileContents, zippedFileName, baseDir, subDirPath, subDirName, userId, resolve);}));
+                            if(i == Object.keys(contents.files).length-1) {
+                              resolveParent(0);
+                            }
+                          }
+                        )
+                      }
                     }
-                  }
-                )
-              }
-            );
+                  )
+                }
+              );
+            });
           });
         }
         else if(incomingFiles.length == 0) { //Create directory
-          let dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
-          let dirName = filePath.split('/').slice(filePath.split('/').length-1,filePath.split('/').length).join('');
+          workDone = new Promise(function(resolveParent, reject){
+            let dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
+            let dirName = filePath.split('/').slice(filePath.split('/').length-1,filePath.split('/').length).join('');
 
-          promises.push(new Promise(function(resolve, reject) { createDirectory(dirPath, dirName, baseDir, userId, unzipFiles, resolve);}));
+            promises.push(new Promise(function(resolve, reject) { createDirectory(dirPath, dirName, baseDir, userId, unzipFiles, resolve);}));
+            resolveParent(0);
+          });
         }
         else { // Upload files
-          for(let i=0; i<incomingFiles.length; i++) {
-            promises.push(new Promise(function(resolve, reject) { createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, resolve);}));
-          }
+          workDone = new Promise(function(resolveParent, reject){
+            for(let i=0; i<incomingFiles.length; i++) {
+              promises.push(new Promise(function(resolve, reject) { createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, resolve);}));
+            }
+            resolveParent(0);
+          });
         }
 
         // Waits for all promises to be done
-        Promise.all(promises).then((result) => {
-
-          var finalResponse = Object.assign({
-            'files': result,
-            'message': "Success"
+        Promise.all([workDone]).then(function(y, n) {
+          Promise.all(promises).then(function(result, rejected) {
+            var finalResponse = Object.assign({
+              'files': result,
+              'message': "Success"
+            });
+            res.json(finalResponse);
           });
-          res.json(finalResponse);
         });
       }
       else {
@@ -211,7 +227,7 @@ async function getFileListByUserId(req, res) {
   });
 }
 
-function createDirectory(dirPath, dirName, baseDir, userId, unzipFiles, resolve) {
+async function createDirectory(dirPath, dirName, baseDir, userId, unzipFiles, resolve) {
   let folder = {
     'name': dirName,
     'path': "/"+dirPath,
@@ -223,43 +239,55 @@ function createDirectory(dirPath, dirName, baseDir, userId, unzipFiles, resolve)
     dirPath = dirPath.split('/').splice(1, dirPath.split('/').length-1).join('/');
   }
 
-  fs.ensureDirSync(baseDir+(unzipFiles?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""));
+  try {
+    fs.ensureDirSync(baseDir+(unzipFiles?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""));
+  }
+  catch (err) {
+    reject(err);
+  }
 
   var folderId;
-  fileCtrl.insert(folder).then(
-    insertedFolder => {
-      folder = insertedFolder;
-      Filedb.findOne({
-        name: folder.name
-      }, (err, dbRes) => {
-        folderId = dbRes._id;
-        folder = folder.toObject();
 
-        permissionToCreate = {
-          'fileId': folderId,
-          'userId': userId,
-          'read': true,
-          'write': true,
-          'delete': true,
-          'isOwner': true,
-        };
-        persmissionCtrl.insert(permissionToCreate).then(
-          permissionToCreate => {
-              let craftedResponse = {
-                'file': insertedFolder,
-                'perm': permissionToCreate
-              }
-              resolve(craftedResponse);
-          }
-        );
-      });
-    }
-  );
+  try {
+    fileCtrl.insert(folder).then(
+      insertedFolder => {
+        folder = insertedFolder;
+        Filedb.findOne({
+          name: folder.name
+        }, (err, dbRes) => {
+          folderId = dbRes._id;
+          folder = folder.toObject();
+
+          permissionToCreate = {
+            'fileId': folderId,
+            'userId': userId,
+            'read': true,
+            'write': true,
+            'delete': true,
+            'isOwner': true,
+          };
+          persmissionCtrl.insert(permissionToCreate).then(
+            permissionToCreate => {
+                let craftedResponse = {
+                  'file': insertedFolder,
+                  'perm': permissionToCreate
+                }
+                console.log("resolved");
+                resolve(craftedResponse);
+            }
+          );
+        });
+      }
+    );
+  }
+  catch(err) {
+    reject(err);
+  }
 }
 
-function createFile(file, filePath, subdirPath, subdirName, userId, resolve) {
+async function createFile(file, filePath, subdirPath, subdirName, userId, resolve) {
   fs.moveSync(file.path, __dirname+"/../userDirectory/"+filePath+"/"+file.name, function(err) {
-    if(err) throw(err);
+    if(err) { reject(err); throw(err); };
   })
 
   //Adding perm to DB
@@ -270,39 +298,51 @@ function createFile(file, filePath, subdirPath, subdirName, userId, resolve) {
   };
 
   var fileId;
-  fileCtrl.insert(fileToUpload).then(
-    insertedFile => {
-      fileToUpload = insertedFile;
-      Filedb.findOne({
-        name: fileToUpload.name
-      }, (err, dbRes) => {
-        fileId = dbRes._id;
-        fileToUpload = fileToUpload.toObject();
 
-        permissionToCreate = {
-          'fileId': fileId,
-          'userId': userId,
-          'read': true,
-          'write': true,
-          'delete': true,
-          'isOwner': true,
-        };
-        persmissionCtrl.insert(permissionToCreate).then(
-          permissionToCreate => {
-            let craftedResponse = {
-              'file': insertedFile,
-              'perm': permissionToCreate
+  try {
+    fileCtrl.insert(fileToUpload).then(
+      insertedFile => {
+        fileToUpload = insertedFile;
+        Filedb.findOne({
+          name: fileToUpload.name
+        }, (err, dbRes) => {
+          fileId = dbRes._id;
+          fileToUpload = fileToUpload.toObject();
+
+          permissionToCreate = {
+            'fileId': fileId,
+            'userId': userId,
+            'read': true,
+            'write': true,
+            'delete': true,
+            'isOwner': true,
+          };
+          persmissionCtrl.insert(permissionToCreate).then(
+            permissionToCreate => {
+              let craftedResponse = {
+                'file': insertedFile,
+                'perm': permissionToCreate
+              }
+              resolve(craftedResponse);
             }
-            resolve(craftedResponse);
-          }
-        );
-      });
-    }
-  );
+          );
+        });
+      }
+    );
+  }
+  catch(err) {
+    reject(err);
+  }
 }
 
-function createFileFromZip(file, fileName, filePath, subdirPath, subdirName, userId, resolve) {
-  fs.writeFileSync(filePath+"/"+fileName, file);
+async function createFileFromZip(file, fileName, filePath, subdirPath, subdirName, userId, resolve) {
+
+  try {
+    fs.writeFileSync(filePath+"/"+fileName, file);
+  }
+  catch(err) {
+    reject(err);
+  }
 
   var subdirFileName = fileName.split('/').splice(fileName.split('/').length-1,1).join('/');
   var subdirFilePath = fileName.split('/').splice(0,fileName.split('/').length-1).join('/');
@@ -315,33 +355,39 @@ function createFileFromZip(file, fileName, filePath, subdirPath, subdirName, use
   };
 
   var fileId;
-  fileCtrl.insert(fileToUpload).then(
-    insertedFile => {
-      fileToUpload = insertedFile;
-      Filedb.findOne({
-        name: fileToUpload.name
-      }, (err, dbRes) => {
-        fileId = dbRes._id;
-        fileToUpload = fileToUpload.toObject();
 
-        permissionToCreate = {
-          'fileId': fileId,
-          'userId': userId,
-          'read': true,
-          'write': true,
-          'delete': true,
-          'isOwner': true,
-        };
-        persmissionCtrl.insert(permissionToCreate).then(
-          permissionToCreate => {
-            let craftedResponse = {
-              'file': insertedFile,
-              'perm': permissionToCreate
+  try {
+    fileCtrl.insert(fileToUpload).then(
+      insertedFile => {
+        fileToUpload = insertedFile;
+        Filedb.findOne({
+          name: fileToUpload.name
+        }, (err, dbRes) => {
+          fileId = dbRes._id;
+          fileToUpload = fileToUpload.toObject();
+
+          permissionToCreate = {
+            'fileId': fileId,
+            'userId': userId,
+            'read': true,
+            'write': true,
+            'delete': true,
+            'isOwner': true,
+          };
+          persmissionCtrl.insert(permissionToCreate).then(
+            permissionToCreate => {
+              let craftedResponse = {
+                'file': insertedFile,
+                'perm': permissionToCreate
+              }
+              resolve(craftedResponse);
             }
-            resolve(craftedResponse);
-          }
-        );
-      });
-    }
-  ); 
+          );
+        });
+      }
+    );
+  }
+  catch(err) {
+    reject(err);
+  }
 }
