@@ -18,10 +18,15 @@ export class OpenGuard implements CanActivate {
       var decoded = jwtDecode(localStorage.getItem("AuthToken"));
       
       if(decoded.status == "Active"){
-        return true
+        
 
       }else if(decoded.status == "Waiting"){
         this.router.navigate(['/waiting'])
+        this.snackBar.open("Your account need to be verified", "Close", {
+          duration: 4000,
+        })
+        return false;
+      }else{
         return false;
       }
     }else {

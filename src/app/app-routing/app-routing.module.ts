@@ -8,6 +8,7 @@ import { IsLoggedInGuard } from '../guards/is-logged-in.guard';
 import { OpenGuard } from '../guards/open.guard';
 import { FileUploadComponent } from '../components/file-upload/file-upload.component';
 import { WaitingComponent } from '../components/waiting/waiting.component';
+import { WaitingGuard } from '../guards/waiting.guard';
 
 const routes: Routes = [{
   path:'',
@@ -24,7 +25,7 @@ const routes: Routes = [{
 {
   path: 'waiting',
   component:WaitingComponent,
-  canActivate:[OpenGuard]
+  canActivate:[WaitingGuard]
 },
 {
   path:'manager',
