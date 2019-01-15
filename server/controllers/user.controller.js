@@ -4,6 +4,7 @@ const User = require('../models/user.model');
 const fileCtrl = require('../controllers/file.controller');
 const permissionsCtrl = require('../controllers/filePermissions.controller');
 const WrongStatusError = require('../errors').WrongStatusError
+const fs = require('fs');
 
 const userSchema = Joi.object({
   fullname: Joi.string().required(),
@@ -57,11 +58,15 @@ async function setStatus(user) {
   if (userDb.status == states.WAITING && newStatus == states.DEACTIVATED)
     throw new WrongStatusError ('You can not deactivate a user who is not active')
 
-  if (! await User.updateOne(userDb, {'status': newStatus}))
-    throw new Error("Update Error")
+  try {
+    await User.updateOne(userDb, {'status': newStatus})
+  } catch(e) {
+    e.message = 'There was an error updating user ' + userDb.fullname
+    throw e
+  }
 
-    createDirectory(doc);
-    initDefaultPermissions(doc);
+    createDirectory(userDb);
+    initDefaultPermissions(userDb);
 }
 
 async function getAllNonActive() {

@@ -26,15 +26,16 @@ async function setStatus(req, res) {
     const users = req.body;
 
     for (let i = 0; i < users.length; i++) {
-      userCtrl.setStatus(users[i]).catch(err => {
-          if (err instanceof WrongStatusError)
-            res.status(400).json({error: err.message})
+      try {
+        await userCtrl.setStatus(users[i])
+      } catch (err) {
+        if (err instanceof WrongStatusError)
+            return res.status(400).json({error: err.message})
           else
-            res.status(500).json({error: err.message})
-      })
+            return res.status(500).json({error: err.message})
+      }
     }
-
-    res.status(200).end()
+    return res.status(200).end()
 
   })
 }
