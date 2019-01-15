@@ -120,13 +120,14 @@ async function insert(req, res) {
             __dirname+"/../userDirectory/"+filePath,
             userId,
             unzipFiles,
-            resolve
+            resolve,
+            reject
           );}));
         }
 
         //Unzip if dir upload
         if(unzipFiles) {
-          workDone = new Promise(function(resolveParent, reject){
+          workDone = new Promise(function(resolveParent, rejectParent){
             fs.readFile(incomingFiles[0].path, function(err, data) {
               if(err) throw err;
               let zip = new jszip();
@@ -143,7 +144,7 @@ async function insert(req, res) {
                         zippedFileName = zippedFileName.split('/')[zippedFileName.split('/').length-1];
 
                         //Creating dir
-                        promises.push(new Promise(function(resolve,reject) { createDirectory(destPath, filePath.split('/').length, zippedFileName, baseDir, userId, unzipFiles, resolve); }));
+                        promises.push(new Promise(function(resolve,reject) { createDirectory(destPath, filePath.split('/').length, zippedFileName, baseDir, userId, unzipFiles, resolve, reject); }));
                         if(i == Object.keys(contents.files).length-1) {
                           resolveParent(0);
                         }
@@ -151,7 +152,7 @@ async function insert(req, res) {
                       else {
                         zip.file(zippedFileName).async('nodebuffer').then( // Is a file
                           (unzippedFileContents) => {
-                            promises.push(new Promise(function(resolve, reject) { createFileFromZip(unzippedFileContents, zippedFileName, baseDir, subDirPath, subDirName, userId, resolve);}));
+                            promises.push(new Promise(function(resolve, reject) { createFileFromZip(unzippedFileContents, zippedFileName, baseDir, subDirPath, subDirName, userId, resolve, reject);}));
                             if(i == Object.keys(contents.files).length-1) {
                               resolveParent(0);
                             }
@@ -166,18 +167,18 @@ async function insert(req, res) {
           });
         }
         else if(incomingFiles.length == 0) { //Create directory
-          workDone = new Promise(function(resolveParent, reject){
+          workDone = new Promise(function(resolveParent, rejectParent){
             let dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
             let dirName = filePath.split('/').slice(filePath.split('/').length-1,filePath.split('/').length).join('');
 
-            promises.push(new Promise(function(resolve, reject) { createDirectory(dirPath, 0, dirName, baseDir, userId, unzipFiles, resolve);}));
+            promises.push(new Promise(function(resolve, reject) { createDirectory(dirPath, 0, dirName, baseDir, userId, unzipFiles, resolve, reject);}));
             resolveParent(0);
           });
         }
         else { // Upload files
-          workDone = new Promise(function(resolveParent, reject){
+          workDone = new Promise(function(resolveParent, rejectParent){
             for(let i=0; i<incomingFiles.length; i++) {
-              promises.push(new Promise(function(resolve, reject) { createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, resolve);}));
+              promises.push(new Promise(function(resolve, reject) { createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, resolve, reject);}));
             }
             resolveParent(0);
           });
@@ -185,10 +186,11 @@ async function insert(req, res) {
 
         // Waits for all promises to be done
         Promise.all([workDone]).then(function(y, n) {
-          Promise.all(promises).then(function(result, rejected) {
+          let message = "Success"
+          Promise.all(promises.map(p => p.catch(() => { undefined; message = "Error"}))).then(function(result, rejected) {
             var finalResponse = Object.assign({
               'files': result,
-              'message': "Success"
+              'message': message
             });
             res.json(finalResponse);
           });
@@ -231,7 +233,7 @@ async function getFileListByUserId(req, res) {
   });
 }
 
-async function createDirectory(dirPath, filePathDepth,dirName, baseDir, userId, unzipFiles, resolve) {
+async function createDirectory(dirPath, filePathDepth,dirName, baseDir, userId, unzipFiles, resolve, reject) {
   let folder = {
     'name': dirName,
     'path': "/"+dirPath,
@@ -244,7 +246,6 @@ async function createDirectory(dirPath, filePathDepth,dirName, baseDir, userId, 
   }
 
   try {
-    console.log(baseDir+(unzipFiles?(dirPath.length>0?"|"+dirPath:"")+"|"+dirName:""))
     fs.ensureDirSync(baseDir+(unzipFiles?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""));
   }
   catch (err) {
@@ -290,10 +291,14 @@ async function createDirectory(dirPath, filePathDepth,dirName, baseDir, userId, 
   }
 }
 
-async function createFile(file, filePath, subdirPath, subdirName, userId, resolve) {
-  fs.moveSync(file.path, __dirname+"/../userDirectory/"+filePath+"/"+file.name, function(err) {
-    if(err) { reject(err); throw(err); };
-  })
+async function createFile(file, filePath, subdirPath, subdirName, userId, resolve, reject) {
+
+  try {
+    fs.moveSync(file.path, __dirname+"/../userDirectory/"+filePath+"/"+file.name);
+  }
+  catch(err) {
+    reject(err);
+  }
 
   //Adding perm to DB
   let fileToUpload = {
@@ -340,7 +345,7 @@ async function createFile(file, filePath, subdirPath, subdirName, userId, resolv
   }
 }
 
-async function createFileFromZip(file, fileName, filePath, subdirPath, subdirName, userId, resolve) {
+async function createFileFromZip(file, fileName, filePath, subdirPath, subdirName, userId, resolve, reject) {
 
   try {
     fs.writeFileSync(filePath+"/"+fileName, file);
