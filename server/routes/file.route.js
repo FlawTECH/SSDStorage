@@ -112,16 +112,16 @@ async function insert(req, res) {
         baseDir = __dirname+"/../userDirectory/"+filePath+(unzipFiles?"/"+incomingFiles[0].name.split('.').splice(0,incomingFiles[0].name.split('.').length-1).join('.'):"")
 
         // Subfolder based on zip file name
-        // if(unzipFiles) {
-        //   promises.push(new Promise(function(resolve, reject) {createDirectory(
-        //     filePath,
-        //     baseDir.split('/').splice(baseDir.split('/').length-1, 1).join('/'),
-        //     __dirname+"/../userDirectory/"+filePath,
-        //     userId,
-        //     unzipFiles,
-        //     resolve
-        //   );}));
-        // }
+        if(unzipFiles) {
+          promises.push(new Promise(function(resolve, reject) {createDirectory(
+            filePath,
+            baseDir.split('/').splice(baseDir.split('/').length-1, 1).join('/'),
+            __dirname+"/../userDirectory/"+filePath,
+            userId,
+            unzipFiles,
+            resolve
+          );}));
+        }
 
         //Unzip if dir upload
         if(unzipFiles) {
