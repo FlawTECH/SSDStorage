@@ -1,0 +1,12 @@
+#status-list{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+
+}
+:host /deep/ .mat-list-item-content {
+    justify-content: space-between;
+}
