@@ -11,10 +11,10 @@ import { tokenKey } from '@angular/core/src/view';
   styleUrls: ['./list-directory.component.scss']
 })
 export class ListDirectoryComponent implements OnInit,OnChanges {
-  private userFileList: File[] = [];
-  private userFolderList : File[] = [];
+  public userFileList: File[] = [];
+  public userFolderList : File[] = [];
   
-  private token = jwtDecode(localStorage.getItem("AuthToken"));
+  public token = jwtDecode(localStorage.getItem("AuthToken"));
 
   @Input()
   public currentPath:String = this.token.fullname;

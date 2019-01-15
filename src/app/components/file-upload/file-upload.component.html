@@ -95,7 +95,7 @@
         </mat-grid-tile>
 
         <mat-grid-tile>
-          <button *ngIf="loading==false; else cancel_upload" type="button" mat-raised-button [disabled]="!valid"
+          <button *ngIf="loading==false && selectedUploadType =='file'; else cancel_upload" type="button" mat-raised-button [disabled]="!valid"
             (click)="clearAllFiles()" >
             <mat-icon>delete</mat-icon> Remove
           </button>
