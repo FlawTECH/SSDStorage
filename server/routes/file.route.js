@@ -113,13 +113,17 @@ async function insert(req, res) {
                 Object.keys(contents.files).forEach(
                   function(zippedFileName, i) {
                     if(zippedFileName.endsWith('/')) { // Is a directory
-                      zippedFileName = zippedFileName.substr(0, zippedFileName.length-1).split('/')[zippedFileName.substr(0, zippedFileName.length-1).split('/').length-1];
-                      createDirectory(filePath, zippedFileName, baseDir, userId, res, unzipFiles, i == Object.keys(contents.files).length-1);
+                      //Fixing filename for creating dirs
+                      zippedFileName = zippedFileName.substr(0,zippedFileName.length-1);
+                      var destPath = filePath+"/"+zippedFileName.split('/').splice(0,zippedFileName.split('/').length-1).join('/');
+                      if(destPath.endsWith('/')) { destPath = destPath.substr(0, destPath.length-1); }
+                      zippedFileName = zippedFileName.split('/')[zippedFileName.split('/').length-1];
+                      createDirectory(destPath, zippedFileName, baseDir, userId, res, unzipFiles, i == Object.keys(contents.files).length-1);
                     }
                     else {
                       zip.file(zippedFileName).async('nodebuffer').then( // Is a file
                         (unzippedFileConents) => {
-                          // createFileFromZip(unzippedFileConents, zippedFileName, filePath, subDirPath, subDirName, userId, res, i == Object.keys(contents.files).length-1);
+                          createFileFromZip(unzippedFileConents, zippedFileName, baseDir, subDirPath, subDirName, userId, res, i == Object.keys(contents.files).length-1);
                         }
                       )
                     }
@@ -186,7 +190,11 @@ function createDirectory(dirPath, dirName, baseDir, userId, res, unzipFiles,isFi
     'type': 'd'
   }
 
-  fs.ensureDirSync(baseDir+(unzipFiles?"/"+dirName:""));
+  // Creating dir on file system
+  if(unzipFiles) {
+    dirPath = dirPath.split('/').splice(1, dirPath.split('/').length-1).join('/');
+  }
+  fs.ensureDirSync(baseDir+(unzipFiles?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""));
 
   var folderId;
   fileCtrl.insert(folder).then(
