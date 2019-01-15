@@ -1,32 +1,74 @@
-<!-- <form #form="ngForm" (ngSubmit)="uploadFiles();">
-  <input type="file" name="picked_files" ([(ngModel)])="this.pickedFile" />
-  <input type="submit" name="submit" value="Upload" />
-</form> -->
-
-<div>
-  <form #form="ngForm" (ngSubmit)="uploadFiles();">
+<mat-card class="totCard mat-elevation-z8">
 
 
-
-
-    <button matTooltip="tooltip" matTooltipShowDelay="1000" id="test" type="button" color="primary" mat-mini-fab
-      (click)="fileInput.click()">
-      <mat-icon>attachment</mat-icon>
-    </button>
+  <mat-card-title-group>
+    <mat-card-title style="text-align: center">Upload a file
+    </mat-card-title>
+    <!-- <mat-card-subtitle>Subtitle</mat-card-subtitle> -->
+  </mat-card-title-group>
+  <!-- <img matCardImage src="Card wide image source"> -->
 
 
 
-    <mat-list>
-      <mat-list-item class="">
-        <mat-icon style="cursor:pointer" color="accent" matTooltip="tooltip" matTooltipShowDelay="500"
-          matTooltipPosition="before">info_outline</mat-icon>
-        <b style="cursor: grab;" [ngStyle]="">filename</b>
+  <form #formFile="ngForm" (ngSubmit)="onSubmit()">
+    <mat-card-content>
 
-        <mat-icon style="cursor:pointer" color="accent" matTooltip="Remove this file" matTooltipShowDelay="500"
-          matTooltipPosition="after">clear</mat-icon>
-      </mat-list-item>
-    </mat-list>
+      <mat-grid-list cols="2" rowHeight="50" [gutterSize]="'1px'">
 
-    <input #fileInput hidden id="document" type="file" (change)="onFileChange($event) " required multiple />
+
+        <mat-grid-tile [colspan]="1" [rowspan]="">
+          <button mat-raised-button matTooltip="docx/doc/xls/xlsx/ppt/pptx/pdf" matTooltipShowDelay="1000" id="test"
+            type="button" color="primary" (click)="fileInput.click()">
+            <mat-icon>attachment</mat-icon>
+          </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="">
+
+          <mat-list>
+            <mat-list-item class="" *ngFor="let fileName of fileNameList;index as i">
+
+              <b style="cursor: grab;">{{fileName}}</b>
+
+              <mat-icon (click)="clearCheckedFile(i)" style="cursor:pointer" color="accent" matTooltip="Remove this file"
+                matTooltipShowDelay="500" matTooltipPosition="after">clear</mat-icon>
+            </mat-list-item>
+          </mat-list>
+        </mat-grid-tile>
+
+
+      </mat-grid-list>
+
+
+      <input #fileInput hidden id="document" type="file" (change)="onFileChange($event) " required multiple />
+
+
+
+
+    </mat-card-content>
+    <mat-card-actions>
+      <mat-grid-list cols="4" rowHeight="50">
+        <mat-grid-tile></mat-grid-tile>
+        <mat-grid-tile>
+          <button #cancelUpload type="submit" mat-raised-button [disabled]="!valid">
+            <mat-icon>cloud_upload</mat-icon> Upload
+
+          </button>
+        </mat-grid-tile>
+
+        <mat-grid-tile>
+          <button *ngIf="loading==false; else cancel_upload" type="button" mat-raised-button [disabled]="!valid"
+            (click)="clearAllFiles()">
+            <mat-icon>delete</mat-icon> Remove
+          </button>
+
+        </mat-grid-tile>
+
+        <mat-grid-tile> </mat-grid-tile>
+
+      </mat-grid-list>
+    </mat-card-actions>
   </form>
-</div>
+  <mat-card-footer>
+    <mat-progress-bar *ngIf="loading" class="progress-bar" mode="query"></mat-progress-bar>
+  </mat-card-footer>
+</mat-card>

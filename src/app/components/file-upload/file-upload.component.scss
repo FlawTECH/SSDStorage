@@ -1,0 +1,33 @@
+.totCard {
+    width: 55%;
+    margin: 2% auto 15px auto;
+    padding: 36px;
+    
+    /* position: relative; */
+  }
+  
+  .progress-bar{
+    
+    position:absolute ;
+    left: 0px;
+    bottom: 0px;
+  }
+  
+  .clear{
+    
+    position:absolute ;
+    left: 0px;
+    bottom: 22px;
+  }
+  
+  /*Error snackbar*/
+  ::ng-deep snack-bar-container.error {
+    background-color: #e91e63; 
+  }
+  
+  ::ng-deep .error .mat-simple-snackbar {
+    color:white;
+  }
+  ::ng-deep .error .mat-simple-snackbar-action {
+    color:#212121;
+  }
