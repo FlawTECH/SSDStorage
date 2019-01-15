@@ -18,6 +18,8 @@ export class FileUploadComponent implements OnInit {
   @Input()
   private currentPath:String;
 
+  private selectedUploadType;
+
   form: FormGroup;
   loading: boolean = false;
   valid: boolean = false;
@@ -30,6 +32,7 @@ export class FileUploadComponent implements OnInit {
   private user:User;
   private fileList = [];
   private fileNameList: string[];
+  private desiredNewFolderName:String;
   private gridSize: string = "75px";
   @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -46,7 +49,8 @@ export class FileUploadComponent implements OnInit {
     this.fileNameValidFade = "fadeOut";
     this.fileNameInvalidFade = "fadeOut";
     this.fileNameList = [];  
-    this.gridSize = "75px";  
+    this.gridSize = "75px";
+    this.desiredNewFolderName="";  
   }
 
   openSnackBar(message: string, action: string, type?: string) {
@@ -65,6 +69,11 @@ export class FileUploadComponent implements OnInit {
     this.form = this.fb.group({
       document: null
     });
+  }
+
+  onFolderNameChange(event){
+    console.log(event);
+    
   }
 
   onFileChange(event) {
@@ -98,22 +107,32 @@ export class FileUploadComponent implements OnInit {
 
   prepareSave(): any {
     let input = new FormData();
-    for (let index = 0; index < this.form.get('document').value.length; index++) {     
-      input.append('document', this.form.get('document').value[index]);
+    if(this.selectedUploadType=="file"){
+      for (let index = 0; index < this.form.get('document').value.length; index++) {     
+        input.append('document', this.form.get('document').value[index]);
+      }
+      input.append("path",this.currentPath.toString())
+    }else if (this.selectedUploadType == "folder"){
+      input.append("path",this.currentPath.toString()+"/"+this.desiredNewFolderName)
     }
-    input.append("path",this.currentPath.toString())
+    
     return input;
   }
 
   onSubmit() {
     this.loading = true;
-    const formModel = this.prepareSave();    
-      console.log(this.user)
-      const request = this.fileService.postFile(formModel,this.currentPath).subscribe(
+    const formModel = this.prepareSave();   
+    console.log("desired foldername: "+this.desiredNewFolderName);
+ 
+    console.log(this.user)
+    if(this.selectedUploadType == "file"){
+      console.log("selecteduploadtype: ");
+      
+      const request = this.fileService.postFile(formModel).subscribe(
         result => {
           if (result == "OK") {
             this.loading = false;         
-            this.openSnackBar("All files were uploaded with succes!", "Close", "success");
+            this.openSnackBar("All files were uploaded with success!", "Close", "success");
             this.clearValidFiles();
             this.valid = false
           } else {
@@ -129,6 +148,27 @@ export class FileUploadComponent implements OnInit {
           this.openSnackBar("Server encountered an error", "Close", "error")
         }
       );  
+    }else if(this.selectedUploadType == "folder"){
+      console.log("ligne 151");
+      
+      if(this.desiredNewFolderName != ""){
+        const request = this.fileService.postFolder(formModel).subscribe(
+          result => {
+            this.loading = false;
+            this.openSnackBar("Folder created with success!", "Close", "success");
+            this.desiredNewFolderName = "";
+          }
+        )
+      }else {
+        console.log("ERROR");
+        console.log("desired new folder name: "+this.desiredNewFolderName);
+        
+        this.openSnackBar("please enter a folder name", "Close", "error");
+        this.loading = false;
+        }
+        
+      }
+      
   }
   //File Management
   clearValidFiles() {
