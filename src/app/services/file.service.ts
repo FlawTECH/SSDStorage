@@ -17,9 +17,8 @@ export class FileService {
   //GET All files
   getFile(path:string): Observable<any> {
     
- 
     return this.http.get(this.linkApi,{
-      params: new HttpParams().set('path', path + '')
+      params: new HttpParams().set('path',path)
     })
   }
 
