@@ -20,6 +20,7 @@ import { HomeComponent } from './home/home.component';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { ManagerComponent } from './components/manager/manager.component';
 import { ListDirectoryComponent } from './components/list-directory/list-directory.component';
+import { WaitingComponent } from './components/waiting/waiting.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { ListDirectoryComponent } from './components/list-directory/list-directo
     FileUploadComponent,
     ManagerComponent,
     ListDirectoryComponent,
+    WaitingComponent,
   ],
   imports: [
     BrowserModule,

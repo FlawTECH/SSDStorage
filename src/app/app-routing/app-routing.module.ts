@@ -7,6 +7,7 @@ import { ListDirectoryComponent } from '../components/list-directory/list-direct
 import { IsLoggedInGuard } from '../guards/is-logged-in.guard';
 import { OpenGuard } from '../guards/open.guard';
 import { FileUploadComponent } from '../components/file-upload/file-upload.component';
+import { WaitingComponent } from '../components/waiting/waiting.component';
 
 const routes: Routes = [{
   path:'',
@@ -19,6 +20,11 @@ const routes: Routes = [{
 }, {
   path: 'admin',
   loadChildren: 'app/admin/admin.module#AdminModule'
+},
+{
+  path: 'waiting',
+  component:WaitingComponent,
+  canActivate:[OpenGuard]
 },
 {
   path:'manager',
