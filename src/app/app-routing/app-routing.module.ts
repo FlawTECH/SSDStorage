@@ -17,9 +17,6 @@ const routes: Routes = [{
   path: 'auth',
   loadChildren: 'app/auth/auth.module#AuthModule',
 }, {
-  path: 'test',
-  component: AdminComponent,
-}, {
   path:'manager',
   component: ManagerComponent,
   canActivate:[OpenGuard],

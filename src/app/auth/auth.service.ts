@@ -6,6 +6,7 @@ import { Subject } from 'rxjs/Subject';
 import { TokenStorage } from './token.storage';
 import { TooltipComponent } from '@angular/material';
 
+
 @Injectable()
 export class AuthService {
 
@@ -46,13 +47,12 @@ export class AuthService {
 
   setUser(user): void {
     if (user){
-      //user.isAdmin = (user.roles.indexOf('admin') > -1);
-      user.isAdmin = (user.isAdmin == false);
-
+      user.isAdmin = (user.roles.indexOf('admin') > -1);
     }
     
     this.$userSource.next(user);
     (<any>window).user = user;
+    console.log("setuser", (<any>window).user)
   }
 
   getUser(): Observable<any> {
