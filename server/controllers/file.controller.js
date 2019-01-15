@@ -44,7 +44,6 @@ function moveFile(req,res) {  // Receive FileObject with new path
         if(req.path.slice(-1) == "/"){
           req.path = req.path.slice(0,-1);
         }
-        
         lastDirectory = req.path.split("/");
         console.log("1: "+lastDirectory)
         if(lastDirectory != decoded.fullname){
