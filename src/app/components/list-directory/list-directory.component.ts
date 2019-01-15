@@ -17,7 +17,7 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
   public token = jwtDecode(localStorage.getItem("AuthToken"));
 
   @Input()
-  public currentPath:String = this.token.fullname;
+  public currentPath:String = "/"+this.token.fullname;
 
   constructor(private fileService:FileService) {}
   
@@ -63,7 +63,14 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
           
           let arr = file.path.split("/").slice(0, file.path.split("/").length);
           var previous = arr.join("/");
-          console.log(file.path)
+          this.currentPath = file.path+"/"+file.name;
+
+
+          let leng = this.currentPath.length
+          this.currentPath = this.currentPath.substr(1,leng -1)
+          console.log(leng)
+
+
           this.userFolderList.push(new File("...",previous))
           result.forEach(element => {
             
@@ -80,6 +87,7 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
         }
       });
     }else{
+      this.currentPath = file.path;
       this.fileService.getFile(file.path).subscribe(result=>{
         if(result){
           this.userFileList = [];
@@ -88,6 +96,7 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
             var str = file.path;
             var arr = file.path.split("/").slice(0, file.path.split("/").length-1);
             var previous = arr.join("/");
+            
             console.log("path: "+file.path)
             
             
