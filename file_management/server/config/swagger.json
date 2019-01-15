@@ -1,0 +1,495 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Mean Application API",
+      "description": "Mean Application API",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "host": "localhost:3000",
+    "basePath": "/",
+    "tags": [
+      {
+        "name": "Users",
+        "description": "API for users in the system"
+      },
+      {
+        "name": "Objects",
+        "description": "API for objects in the system"
+      }
+    ],
+    "schemes": [
+      "http"
+    ],
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "securityDefinitions": {
+      "AuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "paths": {
+      "/users/": {
+        "get": {
+          "tags": ["Users"],
+          "description": "List all Users",
+          "parameters": [],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Users list OK",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        }
+      },
+      "/objects/": {
+        "get": {
+          "tags": ["Objects"],
+          "description": "List all Objects",
+          "parameters": [],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects list OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}": {
+        "get": {
+          "tags": ["Objects"],
+          "description": "List a specific Object by id",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects list OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}": {
+        "patch": {
+          "tags": ["Objects"],
+          "description": "Modify an Object",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          },{
+            "name": "values",
+            "in": "body",
+            "description": "Values for modify name or location",
+            "schema": {
+              "type": "object",
+              "required": ["command"],
+              "properties": {
+                "command": {
+                  "type": "string"
+                },
+                "newname": {
+                  "type": "string"
+                },
+                "newpath": {
+                  "type": "string"
+                }
+              }
+            }
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects modified OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": ["Objects"],
+          "description": "Delete an Object",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects removed OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}/addUser": {
+        "patch": {
+          "tags": ["Objects"],
+          "description": "Add a new User to permission's list",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          },{
+            "name": "userId",
+            "in": "body",
+            "description": "User's id to be include ",
+            "schema": {
+              "type": "object",
+              "required": ["userId"],
+              "properties": {
+                "userId": {
+                  "type": "string"
+                }
+              }
+            }
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects modified OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}/setUserPermissions": {
+        "patch": {
+          "tags": ["Objects"],
+          "description": "Set permissions to an user over the object",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          },{
+            "name": "values",
+            "in": "body",
+            "description": "Values to be use",
+            "schema": {
+              "type": "object",
+              "required": ["userId", "permissions"],
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "permissions":{
+                  "type": "array",
+                  "items":{
+                    "type":"string"
+                  }
+                }             
+              }
+            }
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects modified OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}/removeUser": {
+        "patch": {
+          "tags": ["Objects"],
+          "description": "Remove an User from permission's list",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          },{
+            "name": "userId",
+            "in": "body",
+            "description": "User's id to be remove ",
+            "schema": {
+              "type": "object",
+              "required": ["userId"],
+              "properties": {
+                "userId": {
+                  "type": "string"
+                }
+              }
+            }
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects modified OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}/addGroup": {
+        "patch": {
+          "tags": ["Objects"],
+          "description": "Add a new Group to permission's list",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          },{
+            "name": "groupId",
+            "in": "body",
+            "description": "Group's id to be include ",
+            "schema": {
+              "type": "object",
+              "required": ["groupId"],
+              "properties": {
+                "groupId": {
+                  "type": "string"
+                }
+              }
+            }
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects modified OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}/removeGroup": {
+        "patch": {
+          "tags": ["Objects"],
+          "description": "Remove a Group from permission's list",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          },{
+            "name": "groupId",
+            "in": "body",
+            "description": "Group's id to be remove ",
+            "schema": {
+              "type": "object",
+              "required": ["groupId"],
+              "properties": {
+                "groupId": {
+                  "type": "string"
+                }
+              }
+            }
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects modified OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      },
+      "/objects/{id}/setGroupPermissions": {
+        "patch": {
+          "tags": ["Objects"],
+          "description": "Set permissions to a group over the object",
+          "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": "true"
+          },{
+            "name": "values",
+            "in": "body",
+            "description": "Values to be use",
+            "schema": {
+              "type": "object",
+              "required": ["groupId", "permissions"],
+              "properties": {
+                "groupId": {
+                  "type": "string"
+                },
+                "permissions":{
+                  "type": "array",
+                  "items":{
+                    "type":"string"
+                  }
+                }             
+              }
+            }
+          }],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Objects modified OK",
+              "schema": {
+                "$ref": "#/definitions/Object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "User": {
+        "required": [
+          "email",
+          "fullname",
+          "hashedPassword"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "email": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "fullname": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+    "Object": {
+        "required": [
+          "name",
+          "path",
+          "type",
+          "userOwner",
+          "groupOwner"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "userOwner":{
+            "type": "string"
+          },
+          "usersAuth": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties":{
+                  "userId": {
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+            }
+          },
+          "groupOwner":{
+            "type": "string"
+          },
+          "groupAuth": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties":{
+                  "groupId": {
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        }
+      },
+      "Users": {
+        "type": "array",
+        "$ref": "#/definitions/User"
+      },
+      "Objects": {
+        "type": "array",
+        "$ref": "#/definitions/Object"
+      }
+  }
+}

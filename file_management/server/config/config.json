@@ -1,0 +1,12 @@
+{
+    "test":{
+        "PORT": 3000,
+        "MONGODB_URI": "mongodb://localhost:27017/file_management_project_test",
+        "JWT_SECRET": "afaoflfb2jeqlerlrq34q35q35qlfqlclqjlqjcql3rrq3rqrqflmsclacw9tw"
+    },
+    "development": {
+        "PORT": 3000,
+        "MONGODB_URI": "mongodb://localhost:27017/file_management_project",
+        "JWT_SECRET": "popofjpfknelqwkfn392u095320lk3rl1bndwjbakjcasjbaf2e912434lj3b2"
+    }
+}
