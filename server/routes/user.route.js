@@ -4,6 +4,7 @@ const asyncHandler = require('express-async-handler');
 const userCtrl = require('../controllers/user.controller');
 const requireAdmin = require('../middleware/require-admin')
 const router = express.Router();
+const WrongStatusError = require('../errors').WrongStatusError
 
 router.use(passport.authenticate('jwt', { session: false }))
 
@@ -21,21 +22,20 @@ async function setStatus(req, res) {
   requireAdmin(req, res, async (err) => {
     if (err) res.json(401).json({error: "You must be admin to change a user's status"})
     
-    userCtrl.setStatus(req.body, (err, user) => {
-      console.log(req.body)
-      if (err){
-        console.log("YOOOOOO", err)
-        return res.status(400).json({error: err.message})
-      }
-      else if (!user){
-        console.log("test")
-        res.status(500).json({error: "You are trying to change the status of a user that does not exist"})
-      }
-      else {
-        console.log(err, user)
-        res.json(user)
-      }
-    })
+    const users = req.body;
+
+    for (let i = 0; i < users.length; i++) {
+      userCtrl.setStatus(users[i])
+        .catch(err => {
+          if (err instanceof WrongStatusError)
+            res.status(400).json({error: err.message})
+          else
+            res.status(500).json({error: err.message})
+      })
+    }
+
+    res.status(200).end()
+
   })
 }
 

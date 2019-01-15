@@ -4,10 +4,11 @@ import { AdminService } from './admin.service'
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit {
   private users;
-  
+
   constructor(private adminService: AdminService ) {}
 
   public ngOnInit() {
@@ -19,15 +20,18 @@ export class AdminComponent implements OnInit {
   onSubmit(){
     const req = [];
 
-    for(let i = 0; i < this.users.length; i++) {
+    for (let i = 0; i < this.users.length; i++) {
       if (this.users[i].status != 'Waiting') {
         req.push({
           "_id" : this.users[i]._id,
           "newStatus" : this.users[i].status
         });
       }
+
+      if (this.users[i].status == 'Waiting' && this.users[i].status == 'Deactivated')
+        return
     }
-    console.log('submit')
+    
     this.adminService.setStatus(req).subscribe(res => {
       console.log(res)
     });

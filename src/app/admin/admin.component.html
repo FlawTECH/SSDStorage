@@ -1,5 +1,5 @@
 <div>Welcome to the admin component</div>
-<mat-list role="list">
+<mat-list role="list" id="status-list">
     <form (ngSubmit)="onSubmit()" #userStatusForm="ngForm">
         <mat-list-item role="listitem" *ngFor="let user of users">
             <div class="fullname">Pseudo : {{user.fullname}}</div>

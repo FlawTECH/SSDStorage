@@ -32,7 +32,7 @@ export class AuthService {
       this.http.post('/api/auth/register', {
         fullname,
         password,
-        roles: ['admin'],
+        roles: [],
         status,
         repeatPassword
       }).subscribe((data : any) => {
