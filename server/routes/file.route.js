@@ -166,7 +166,12 @@ async function insert(req, res) {
 
         // Waits for all promises to be done
         Promise.all(promises).then((result) => {
-          res.json(result);
+
+          var finalResponse = Object.assign({
+            'files': result,
+            'message': "Success"
+          });
+          res.json(finalResponse);
         });
       }
       else {
