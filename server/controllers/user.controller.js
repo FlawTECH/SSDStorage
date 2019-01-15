@@ -5,7 +5,7 @@ const WrongStatusError = require('../errors').WrongStatusError
 
 const userSchema = Joi.object({
   fullname: Joi.string().required(),
-  status: Joi.string().required().regex(/^Waiting$|^Active$|^Deleted$|^Deactivated$/),
+  status: Joi.string().required().regex(/^Waiting$/),
   password: Joi.string().required(),
   repeatPassword: Joi.string().required().valid(Joi.ref('password')),
   roles: Joi.array().required(),
@@ -19,11 +19,9 @@ const states = {
 }
 
 async function insert(user) {
-  user.roles = []
-  if (user.roles.indexOf('admin') > -1 && user.status !== "Active")
-    throw new WrongStatusError ('An admin must be active when registering')
   if (user.roles.indexOf('admin') < 0 && user.status !== "Waiting")
     throw new WrongStatusError ('A user must be waiting when registering')
+
   user = await Joi.validate(user, userSchema, { abortEarly: false });
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
