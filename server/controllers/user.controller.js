@@ -9,7 +9,7 @@ const fs = require('fs');
 const userSchema = Joi.object({
   fullname: Joi.string().required(),
   status: Joi.string().required().regex(/^Waiting$/),
-  password: Joi.string().required(),
+  password: Joi.string().required().min(10).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/),// au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial
   repeatPassword: Joi.string().required().valid(Joi.ref('password')),
   roles: Joi.array().required(),
 })

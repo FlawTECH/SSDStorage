@@ -9,6 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms'
+import { MatSnackBarModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { FormsModule } from '@angular/forms'
     MatListModule,
     MatSelectModule,
     MatButtonModule,
-    FormsModule
+    FormsModule,
+    MatSnackBarModule
   ],
   providers: [
     OnlyAdminUsersGuard,
