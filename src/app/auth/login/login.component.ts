@@ -20,9 +20,9 @@ export class LoginComponent implements OnInit {
 
   login(): void {
     this.authService.login(this.pseudo, this.password)
-    .subscribe(data => {
-      this.router.navigate(['manager']);
-    })
+      .subscribe(data => {
+        this.router.navigate(['manager']);
+      })
   }
 
 }

@@ -21,7 +21,11 @@ const UserSchema = new mongoose.Schema({
   },  
   roles: [{
     type: String
-  }]
+  }],
+  secret: {
+    type: String, 
+    required: true
+  }
 }, {
   versionKey: false
 });

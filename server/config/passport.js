@@ -3,6 +3,7 @@ const LocalStrategy = require('passport-local');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const bcrypt = require('bcrypt');
+const qrcode = require('qrcode')
 
 const User = require('../models/user.model');
 const config = require('./config');
@@ -11,12 +12,17 @@ const localLogin = new LocalStrategy({
   usernameField: 'fullname'
 }, async (fullname, password, done) => {
   let user = await User.findOne({ fullname });
+
   if (!user || !bcrypt.compareSync(password, user.hashedPassword)) {
     return done(null, false, { error: 'Your login details could not be verified. Please try again.' });
   }
+
   user = user.toObject();
+  qrcode.toDataURL(user.secret, (err, qrcode_url) => {
+    console.log(qrcode_url)
+  })
+
   delete user.hashedPassword;
-  console.log(user);
   done(null, user);
 });
 

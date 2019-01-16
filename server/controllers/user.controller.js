@@ -28,6 +28,8 @@ async function insert(user) {
   user = await Joi.validate(user, userSchema, { abortEarly: false });
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
+  user.secret = secret.base32
+  console.log(user.secret)
   return await new User(user).save();
 }
 
@@ -82,7 +84,7 @@ function createDirectory(doc) {
   fullname = doc.fullname;
   var dir = __dirname + "/../userDirectory/"+ fullname;
   if (!fs.existsSync(dir)){
-  fs.mkdirSync(dir);
+    fs.mkdirSync(dir);
   }
 }
 
