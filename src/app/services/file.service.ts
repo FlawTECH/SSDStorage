@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import * as jwtDecode from 'jwt-decode';
 import { saveAs } from 'file-saver';
-import * as FileSaver from 'file-saver';
 
 @Injectable({
   providedIn: 'root'
