@@ -33,15 +33,12 @@ router.route('/rename')
   .put(asyncHandler(renameFile));
 router.route('/move')
   .put(asyncHandler(moveFile));
-<<<<<<< HEAD
 router.route('/download')
   .post(asyncHandler(download));
-=======
 router.route('/generate')
   .post(asyncHandler(generateGroup));
 /* router.route('/download')
   .post(asyncHandler(download)); */
->>>>>>> 2f3a42198668af7466f04115acc115f70b298fe6
 
 router.get('/download', function(req, res){
   console.log(req.query.path)
