@@ -183,10 +183,11 @@ async function insert(req, res) {
             resolveParent(0);
           });
         }
-        else { // Upload files
+        else { // Upload files & directories
           workDone = new Promise(function(resolveParent, rejectParent){
             for(let i=0; i<incomingFiles.length; i++) {
-              promises.push(new Promise(function(resolve, reject) { createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, resolve, reject);}));
+              console.log(incomingFiles[i]);
+              // promises.push(new Promise(function(resolve, reject) { createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, resolve, reject);}));
             }
             resolveParent(0);
           });
