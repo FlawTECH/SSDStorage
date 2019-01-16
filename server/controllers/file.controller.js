@@ -4,7 +4,6 @@ const FilePermissions = require('../models/filePermissions.model');
 const jwtDecode = require("jwt-decode");
 const User = require('../models/user.model');
 const fs = require('fs');
-const shortid = require('shortid');
 
 
 const FileSchema = Joi.object({
@@ -18,24 +17,10 @@ module.exports = {
   deleteFile,
   renameFile,
   moveFile,
-  generateGroup
 }
 
-function generateGroup(req,res,callback) {  // Receive fileId + name
-  var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
-  var userid = decoded._id;
-  req = req.body;
-  var finalResponse = Object.assign({
-    'message': "Success",
-    'url' : "notEmpty"
-  });
-  finalResponse.url = shortid.generate();
-  console.log(finalResponse.url)
-  callback(res,finalResponse);
 
-}
-
-function moveFile(req,res) {  // Receive FileObject with new path
+function moveFile(req,res,callback) {  // Receive FileObject with new path
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
   req = req.body;
@@ -168,15 +153,23 @@ function deleteFile(req,res, callback) { // Receive fileId
           File.findByIdAndDelete(req.fileId, function(err,file) {
             if(err) throw err;
             console.log('File with Id: '+req.fileId +' deleted in the database!')
-            fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
+            fs.access(__dirname+"/../userDirectory/"+file.path+"/"+file.name, fs.constants.F_OK, function (err, stats) {
               if (err) {
                   return console.error(err);
-              }         
-              fs.unlink(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
-                    if(err) return console.log(err);
-                    console.log('file deleted successfully!');
-                    callback(res, finalResponse);
+              }
+              if(file.type="d"){
+                fs.rmdir(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+                  if(err) return console.log(err);
+                  console.log('Directory deleted successfully!');
+                  callback(res, finalResponse);
               });  
+              }else{
+                fs.unlink(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+                  if(err) return console.log(err);
+                  console.log('file deleted successfully!');
+                  callback(res, finalResponse);
+              });  
+              }      
             });
           });
         } 
@@ -193,14 +186,21 @@ function deleteFile(req,res, callback) { // Receive fileId
         File.findByIdAndDelete(req.fileId, function(err,file) {
           if(err) throw err;
           console.log('File with Id: '+req.fileId +' deleted in the database!')
-          fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
+          fs.access(__dirname+"/../userDirectory/"+file.path+"/"+file.name,fs.constants.F_OK, function (err, stats) {
             if (err) {
                 return console.error(err);
-            }         
-            fs.unlink(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
-                  if(err) return console.log(err);
-                  console.log('file deleted successfully!');
-            });  
+            }  
+            if(file.type="d"){
+              fs.rmdir(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+                if(err) return console.log(err);
+                console.log('Directory deleted successfully!');
+          });  
+            }else {
+              fs.unlink(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+                if(err) return console.log(err);
+                console.log('file deleted successfully!');
+          });  
+            }     
           });
         });
       }
