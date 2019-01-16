@@ -35,14 +35,14 @@ router.route('/move')
   .put(asyncHandler(moveFile));
 router.route('/generate')
   .post(asyncHandler(generateGroup));
-router.route('/download')
-  .post(asyncHandler(download));
+/* router.route('/download')
+  .post(asyncHandler(download)); */
 
-// router.get('/download/:fileName', function(req, res){
-//   console.log()
-//     var file = __dirname + '/../userDirectory/'+req.params.fileName;
-//     res.download(file);
-//   });
+router.get('/download', function(req, res){
+  console.log(req.query.path)
+  var file = __dirname + '/../userDirectory'+req.query.path;
+  res.download(file);
+});
 
 async function download(req,res) {
   var file = __dirname + '/../userDirectory/'+req.body.path;

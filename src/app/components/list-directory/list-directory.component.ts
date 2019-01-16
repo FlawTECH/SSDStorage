@@ -3,6 +3,7 @@ import { FileService } from '../../services/file.service';
 import { File } from '../../class/file';
 import * as jwtDecode from 'jwt-decode';
 import { tokenKey } from '@angular/core/src/view';
+import { saveAs } from 'file-saver';
 
 
 @Component({
@@ -122,11 +123,12 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
     
   }
 
-  downloadFile(path:any){
-    console.log(path);
+  downloadFile(path:any,name:any){
+    let pathh = path + name;
     
-    this.fileService.donwloadFile(path).subscribe(result => console.log(result)
-    );
+    //window.location.href='http://localhost:4040/api/file/download?path=/zeyd/download.jpg';
+    this.fileService.donwloadFile(pathh).subscribe(data => saveAs(data, name)
+    ); 
   }
 
 }

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import * as jwtDecode from 'jwt-decode';
+import { saveAs } from 'file-saver';
+import * as FileSaver from 'file-saver';
 
 @Injectable({
   providedIn: 'root'
@@ -37,11 +39,14 @@ export class FileService {
   }
 
   //Download a file
-  donwloadFile(path:String){
-    return this.http.post(this.linkApi+"/download", {
-      "path":path,
-    })
-    }
+  donwloadFile(path:String): Observable<any> {
+    return  this.http.get(this.linkApi+"/download",
+    {
+      params: new HttpParams().set('path', path.toString()),
+      responseType: 'blob'
+    },
+    )
+  }
 }
 
   
