@@ -36,7 +36,9 @@ router.route('/move')
 
 
 router.get('/download/:fileName', function(req, res){
-    var file = __dirname + '/../userDirectory/'+req.params.fileName;
+    console.log(req.params.fileName);
+    
+    var file = __dirname + '/../userDirectory'+req.params.fileName;
     res.download(file);
   });
 

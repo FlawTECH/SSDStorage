@@ -122,4 +122,12 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
     
   }
 
+  downloadFile(path:any){
+    console.log(path);
+    
+    this.fileService.donwloadFile(path).subscribe(result => console.log(result)
+    );
+  }
+
 }
+

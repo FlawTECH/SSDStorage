@@ -36,6 +36,14 @@ export class FileService {
     });
   }
 
+  //Download a file
+  donwloadFile(path:String){
+    return this.http.post(this.linkApi+"/download", {
+      "path":path,
+    })
+    }
+}
+
   
 
-}
+
