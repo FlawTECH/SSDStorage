@@ -157,7 +157,7 @@ function deleteFile(req,res, callback) { // Receive fileId
               if (err) {
                   return console.error(err);
               }
-              if(file.type="d"){
+              if(file.type=="d"){
                 fs.rmdir(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
                   if(err) return console.log(err);
                   console.log('Directory deleted successfully!');
@@ -190,7 +190,7 @@ function deleteFile(req,res, callback) { // Receive fileId
             if (err) {
                 return console.error(err);
             }  
-            if(file.type="d"){
+            if(file.type=="d"){
               fs.rmdir(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
                 if(err) return console.log(err);
                 console.log('Directory deleted successfully!');

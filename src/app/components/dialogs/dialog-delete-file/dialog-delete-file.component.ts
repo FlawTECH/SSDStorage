@@ -6,7 +6,7 @@ import { File } from '../../../class/file';
 export interface DialogData {
   file: File,
   index:number,
-  userFileList:File[]
+  userFolderList:File[]
 }
 
 @Component({
@@ -34,9 +34,9 @@ export class DialogDeleteFileComponent implements OnInit {
       if(result.message == "Success"){
         console.log("success");
 
-        this.data.userFileList.splice(this.data.index,1);
+        this.data.userFolderList.splice(this.data.index,1);
 
-        console.log(this.data.userFileList);
+        console.log(this.data.userFolderList);
         
         this.dialogRef.close(this.data.file);
       }else{

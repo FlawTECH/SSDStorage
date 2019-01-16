@@ -7,7 +7,7 @@
       <mat-icon mat-list-icon>folder</mat-icon>
       <h4 mat-line>{{item.name}}</h4>
       <p mat-line> {{item.createdAt | date}} </p>
-      <button *ngIf="item.name!='...'" mat-icon-button (click)="deleteFile(item,i)" color="accent">
+      <button *ngIf="item.name!='...'" mat-icon-button (click)="deleteFolder(item,i)" color="accent">
         <mat-icon class="mat-18">delete</mat-icon>
       </button>
       <button mat-icon-button (click)="clickOnDirectory(item);" color="primary">

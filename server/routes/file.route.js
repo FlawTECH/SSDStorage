@@ -35,8 +35,7 @@ router.route('/move')
   .put(asyncHandler(moveFile));
 router.route('/download')
   .post(asyncHandler(download));
-router.route('/generate')
-  .post(asyncHandler(generateGroup));
+
 /* router.route('/download')
   .post(asyncHandler(download)); */
 

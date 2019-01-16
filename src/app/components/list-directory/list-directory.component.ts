@@ -169,6 +169,22 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
      
     });
   }
+
+  deleteFolder(file:File,index:number){
+    const dialogRef = this.dialog.open(DialogDeleteFileComponent,{
+      width: '500px',
+      data:{
+        file:file,
+        index:index,
+        userFolderList : this.userFolderList
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+
+     
+    });
+  }
   
 }
 
