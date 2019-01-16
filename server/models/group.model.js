@@ -14,7 +14,12 @@ const GroupSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User',
     required: true
-  }
+  },
+  status: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
 });
 
 module.exports = mongoose.model('Group', GroupSchema);

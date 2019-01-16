@@ -50,7 +50,7 @@ async function download(req,res) {
 }
 
 async function generateGroup(req,res) {
-  await fileCtrl.generateGroup(req, res, FileCallback); 
+  await fileCtrl.generateGroup(req, res, FileCallback);
 }
 
 function moveFile(req,res) {
