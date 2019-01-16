@@ -4,6 +4,8 @@ import { File } from '../../class/file';
 import * as jwtDecode from 'jwt-decode';
 import { tokenKey } from '@angular/core/src/view';
 import { saveAs } from 'file-saver';
+import { MatDialog } from '@angular/material';
+import { DialogRenameFileComponent } from '../dialogs/dialog-rename-file/dialog-rename-file.component';
 
 
 @Component({
@@ -20,7 +22,7 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
   @Input()
   public currentPath:String = "/"+this.token.fullname;
 
-  constructor(private fileService:FileService) {}
+  constructor(private fileService:FileService,public dialog: MatDialog) {}
   
   ngOnChanges(changes){
     console.log('Changed', changes.currentPath.currentValue, changes.currentPath.previousValue);
@@ -131,5 +133,25 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
     ); 
   }
 
+  openDialog(file:File,index:number){
+    console.log(file);
+    
+    const dialogRef = this.dialog.open(DialogRenameFileComponent, {
+      width: '250px',
+      data: {
+        file: file,
+        index:index,
+        userFileList:this.userFileList
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      //console.log(result);
+      
+      //this.fileService.renameFile(result.)
+    });
+  }
+  
 }
 

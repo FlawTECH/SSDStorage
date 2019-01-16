@@ -47,6 +47,13 @@ export class FileService {
     },
     )
   }
+
+  renameFile(newFileName:String, fileId:String): Observable<any>{
+    return this.http.put(this.linkApi+"/rename",{
+      "name": newFileName,
+      "fileId": fileId
+    })
+  }
 }
 
   
