@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Rename the file</h1>
+<div mat-dialog-content>
+  <p>file name</p>
+  <mat-form-field>
+    <input #newFileName matInput [ngModel]="data.file.name">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button (click)="onOkClick(this.newFileName.value)" cdkFocusInitial>Ok</button>
+</div>

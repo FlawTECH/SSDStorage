@@ -33,14 +33,21 @@ router.route('/rename')
   .put(asyncHandler(renameFile));
 router.route('/move')
   .put(asyncHandler(moveFile));
+<<<<<<< HEAD
 router.route('/download')
   .post(asyncHandler(download));
+=======
+router.route('/generate')
+  .post(asyncHandler(generateGroup));
+/* router.route('/download')
+  .post(asyncHandler(download)); */
+>>>>>>> 2f3a42198668af7466f04115acc115f70b298fe6
 
-// router.get('/download/:fileName', function(req, res){
-//   console.log()
-//     var file = __dirname + '/../userDirectory/'+req.params.fileName;
-//     res.download(file);
-//   });
+router.get('/download', function(req, res){
+  console.log(req.query.path)
+  var file = __dirname + '/../userDirectory'+req.query.path;
+  res.download(file);
+});
 
 async function download(req,res) {
   var file = __dirname + '/../userDirectory/'+req.body.path;
@@ -85,7 +92,7 @@ async function insert(req, res) {
   });
 
   form.on('field', function(name, value) {
-    if(name === "path") { filePath = value; }
+    if(name === "path") { filePath = value; if(filePath.startsWith('/')) { filePath = filePath.substr(1, filePath.length-1) } }
     if(name === "isfolder" && value === "true") { unzipFiles = true; }
   });
 
@@ -159,7 +166,7 @@ async function insert(req, res) {
                         zippedFileName = zippedFileName.split('/')[zippedFileName.split('/').length-1];
 
                         //Creating dir
-                        promises.push(new Promise(function(resolve,reject) { createDirectory(destPath, filePath.split('/').length, zippedFileName, baseDir, userId, unzipFiles, resolve, reject); }));
+                        promises.push(new Promise(function(resolve,reject) { createDirectory(destPath, filePath.split('/').length, zippedFileName, baseDir, userId, unzipFiles, false, resolve, reject); }));
                         if(i == Object.keys(contents.files).length-1) {
                           resolveParent(0);
                         }
@@ -187,15 +194,28 @@ async function insert(req, res) {
             let dirPath = filePath.split('/', filePath.split('/').length-1).join('/');
             let dirName = filePath.split('/').slice(filePath.split('/').length-1,filePath.split('/').length).join('');
 
-            promises.push(new Promise(function(resolve, reject) { createDirectory(dirPath, 0, dirName, baseDir, userId, unzipFiles, resolve, reject);}));
+            promises.push(new Promise(function(resolve, reject) { createDirectory(dirPath, 0, dirName, baseDir, userId, unzipFiles, false, resolve, reject);}));
             resolveParent(0);
           });
         }
         else { // Upload files & directories
           workDone = new Promise(function(resolveParent, rejectParent){
             for(let i=0; i<incomingFiles.length; i++) {
-              console.log(incomingFiles[i]);
-              // promises.push(new Promise(function(resolve, reject) { createFile(incomingFiles[i], filePath, subDirPath, subDirName, userId, resolve, reject);}));
+
+              //In case of nested directories
+              var folderDepth = incomingFiles[i].name.split('/').length-1;
+              var fixedFileName = incomingFiles[i].name.split('/')[incomingFiles[i].name.split('/').length-1];
+              var fixedFileSubdir = incomingFiles[i].name.split('/').splice(0, folderDepth).join('/');
+
+              for(var j=0; j<folderDepth; j++) {
+                var fileSubdirName = incomingFiles[i].name.split('/')[j];
+                var fileSubdirPath = filePath+(j>0?"/"+incomingFiles[i].name.split('/').splice(0, incomingFiles[i].name.split('/').length-2).join('/'):"");
+                if(!fs.existsSync(baseDir.split('/').splice(0,baseDir.split('/').length-1).join('/')+"/"+fileSubdirPath+"/"+fileSubdirName)) {
+                  promises.push(new Promise(function(resolve, reject) { createDirectory(fileSubdirPath, 0, fileSubdirName, baseDir, userId, unzipFiles, true, resolve, reject); }))
+                }
+              }
+
+              promises.push(new Promise(function(resolve, reject) { createFile(fixedFileName, incomingFiles[i].path, filePath, fixedFileSubdir, userId, resolve, reject);}));
             }
             resolveParent(0);
           });
@@ -250,8 +270,7 @@ async function getFileListByUserId(req, res) {
   });
 }
 
-async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId, unzipFiles, resolve, reject) {
-  
+async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId, unzipFiles, dirUpload, resolve, reject) {
   let folder = {
     'name': dirName,
     'path': "/"+dirPath,
@@ -262,11 +281,14 @@ async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId,
   if(unzipFiles) {
     dirPath = dirPath.split('/').splice(filePathDepth+1, dirPath.split('/').length-2).join('/');
   }
+  else if(dirUpload) {
+    dirPath = dirPath.split('/').splice(1, dirPath.split('/').length-1).join('/');
+  }
 
     
   try {
-    if(fs.existsSync(baseDir+(unzipFiles?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""))) { reject("Directory already exists"); return;}
-    fs.ensureDirSync(baseDir+(unzipFiles?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""));
+    if(fs.existsSync(baseDir+(unzipFiles||dirUpload?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""))) { reject("Directory already exists"); return;}
+    fs.ensureDirSync(baseDir+(unzipFiles||dirUpload?(dirPath.length>0?"/"+dirPath:"")+"/"+dirName:""));
   }
   catch (err) {
     reject(err);
@@ -311,22 +333,24 @@ async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId,
   }
 }
 
-async function createFile(file, filePath, subdirPath, subdirName, userId, resolve, reject) {
+async function createFile(fileName, nestedFilePath, filePath, subdirPath, userId, resolve, reject) {
 
+  //Adding perm to DB
+  let fileToUpload = {
+    'name': fileName,
+    'path': "/"+filePath+(subdirPath.length>0?"/"+subdirPath:""),
+    'type': 'f'
+  };
+
+  //Moving file
   try {
-    fs.moveSync(file.path, __dirname+"/../userDirectory/"+filePath+"/"+file.name);
+    fs.moveSync(nestedFilePath, __dirname+"/../userDirectory/"+filePath+"/"+(subdirPath.length>0?subdirPath+"/":"")+fileName);
   }
   catch(err) {
     reject(err);
     return;
   }
 
-  //Adding perm to DB
-  let fileToUpload = {
-    'name': file.name,
-    'path': (subdirPath.length>0?"/":"")+subdirPath+"/"+subdirName,
-    'type': 'f'
-  };
 
   var fileId;
 

@@ -21,6 +21,7 @@ import { FileUploadComponent } from './components/file-upload/file-upload.compon
 import { ManagerComponent } from './components/manager/manager.component';
 import { ListDirectoryComponent } from './components/list-directory/list-directory.component';
 import { WaitingComponent } from './components/waiting/waiting.component';
+import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-file/dialog-rename-file.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { WaitingComponent } from './components/waiting/waiting.component';
     ManagerComponent,
     ListDirectoryComponent,
     WaitingComponent,
+    DialogRenameFileComponent,
   ],
   imports: [
     BrowserModule,
@@ -53,7 +55,7 @@ import { WaitingComponent } from './components/waiting/waiting.component';
     useClass: CatchErrorInterceptor,
     multi: true,
   }],
-  entryComponents: [],
+  entryComponents: [DialogRenameFileComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
