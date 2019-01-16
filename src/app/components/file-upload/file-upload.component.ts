@@ -115,8 +115,15 @@ export class FileUploadComponent implements OnInit {
         input.append('document', this.form.get('document').value[index]);
       }
       input.append("path",this.currentPath.toString())
-    }else if (this.selectedUploadType == "folder"){
+    }
+    else if (this.selectedUploadType == "new-folder"){
       input.append("path",this.currentPath.toString()+"/"+this.desiredNewFolderName)
+    }
+    else if(this.selectedUploadType=="folder-from-computer"){
+      for (let index = 0; index < this.form.get('document').value.length; index++) {     
+        input.append('document', this.form.get('document').value[index]);
+      }
+      input.append("path",this.currentPath.toString())
     }
     
     return input;
@@ -158,7 +165,8 @@ export class FileUploadComponent implements OnInit {
           this.openSnackBar("Server encountered an error", "Close", "error")
         }
       );  
-    }else if(this.selectedUploadType == "folder"){
+    }
+    else if(this.selectedUploadType == "new-folder"){
       
       
       if(this.desiredNewFolderName != ""){
@@ -192,9 +200,42 @@ export class FileUploadComponent implements OnInit {
         
         this.openSnackBar("please enter a folder name", "Close", "error");
         this.loading = false;
-        }
-        
       }
+        
+    }
+    else if(this.selectedUploadType == "folder-from-computer"){
+     
+      const request = this.fileService.postFile(formModel).subscribe(
+        result => {
+          //this.getfile(this.token.fullname);
+          
+          if (result.message == "Success") {
+            result.files.forEach(element => {
+              if(element.perm.read == true){
+                this.listDirectoryComponent.userFileList.push(File.fromJSON(element.file));
+                this.loading = false;         
+                this.openSnackBar("All files were uploaded with success!", "Close", "success");
+                this.clearValidFiles();
+                this.valid = false;
+              }
+            });
+            
+
+          } else if(result.message == "Error") {
+            this.loading = false;
+            //this.shakeAnimation = 'invalid';
+            this.clearValidFiles();
+            this.openSnackBar("Some files weren't uploaded", "Close", "error")
+          }
+        },
+        err => {
+          console.log(err);        
+          this.loading = false;
+          this.shakeAnimation = 'invalid';
+          this.openSnackBar("Server encountered an error", "Close", "error")
+        }
+      );  
+    }
       
   }
 

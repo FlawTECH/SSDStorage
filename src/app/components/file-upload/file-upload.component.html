@@ -7,7 +7,8 @@
 
         <mat-select placeholder="upload type" [(value)]="selectedUploadType">
           <mat-option default value="file">file</mat-option>
-          <mat-option value="folder">folder</mat-option>
+          <mat-option value="folder-from-computer">folder from computer</mat-option>
+          <mat-option value="new-folder">new folder</mat-option>
         </mat-select>
 
       </mat-form-field>
@@ -25,8 +26,18 @@
 
 
         <mat-grid-tile [colspan]="1" [rowspan]="">
-          <div *ngIf="selectedUploadType=='file'; then fileUpload"></div>
-          <ng-template #fileUpload>
+          <div *ngIf="selectedUploadType=='file'; then fileUploadfile"></div>
+          <ng-template #fileUploadfile>
+            <input #fileInput hidden id="document" type="file" (change)="onFileChange($event) " required multiple />
+            <button mat-raised-button matTooltip="tooltip" matTooltipShowDelay="1000" id="test" type="button" color="primary"
+              (click)="fileInput.click()">
+              <mat-icon>attachment</mat-icon>
+            </button>
+          </ng-template>
+
+          <div *ngIf="selectedUploadType=='folder-from-computer'; then fileUploadfolder"></div>
+          <ng-template #fileUploadfolder>
+            <input #fileInput hidden id="document" type="file" (change)="onFileChange($event) " required multiple webkitDirectory />
             <button mat-raised-button matTooltip="tooltip" matTooltipShowDelay="1000" id="test" type="button" color="primary"
               (click)="fileInput.click()">
               <mat-icon>attachment</mat-icon>
@@ -59,7 +70,7 @@
           </mat-grid-tile>
         </ng-template>
 
-        <div *ngIf="selectedUploadType=='folder'; then folderUploadDescr "></div>
+        <div *ngIf="selectedUploadType=='new-folder'; then folderUploadDescr "></div>
         <ng-template #folderUploadDescr>
           <mat-grid-tile [colspan]="1" [rowspan]="">
             <mat-form-field>
@@ -74,7 +85,6 @@
       </mat-grid-list>
 
 
-      <input #fileInput hidden id="document" type="file" (change)="onFileChange($event) " required multiple webkitDirectory />
 
 
 
@@ -88,7 +98,11 @@
             <mat-icon>cloud_upload</mat-icon> Upload
 
           </button>
-          <button *ngIf="selectedUploadType =='folder'" #cancelUpload type="submit" mat-raised-button>
+          <button *ngIf="selectedUploadType =='folder-from-computer'" #cancelUpload type="submit" mat-raised-button [disabled]="!valid">
+            <mat-icon>cloud_upload</mat-icon> Upload
+
+          </button>
+          <button *ngIf="selectedUploadType =='new-folder'" #cancelUpload type="submit" mat-raised-button>
             <mat-icon>create_new_folder</mat-icon> Create folder
   
           </button>
