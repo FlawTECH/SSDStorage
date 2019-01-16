@@ -211,9 +211,16 @@ export class FileUploadComponent implements OnInit {
           
           if (result.message == "Success") {
             result.files.forEach(element => {
-              if(element.perm.read == true){
+              console.log(this.currentPath)
+              if(element.perm.read == true && element.file.type == "f" && this.currentPath == element.file.path){
                 this.listDirectoryComponent.userFileList.push(File.fromJSON(element.file));
                 this.loading = false;         
+                this.openSnackBar("All files were uploaded with success!", "Close", "success");
+                this.clearValidFiles();
+                this.valid = false;
+              }else if(element.perm.read == true && element.file.type == "d" && this.currentPath == element.file.path) {
+                this.listDirectoryComponent.userFolderList.push(File.fromJSON(element.file));
+                this.loading = false;
                 this.openSnackBar("All files were uploaded with success!", "Close", "success");
                 this.clearValidFiles();
                 this.valid = false;
