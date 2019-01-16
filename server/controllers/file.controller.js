@@ -83,39 +83,55 @@ function moveFile(req,res) {  // Receive FileObject with new path
 }
 
 
-function renameFile(req,res) {  // Receive fileId + name
+function renameFile(req,res,callback) {  // Receive fileId + name
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
   req = req.body;
   var newvalues = { $set: {name: req.name } };
+  var finalResponse = Object.assign({
+    'message': "Success"
+  });
   if(decoded.roles.indexOf('admin') == 0) { // Check if user is admin and ifso rename  file entries in DB + file in userDirectory
     File.findByIdAndUpdate(req.fileId, newvalues,  function(err,file) {
       if(err) throw err;
-      fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
-        if (err) {
-            return console.error(err);
-        }         
-        fs.rename(__dirname+"/../userDirectory/"+file.path+"/"+file.name, __dirname+"/../userDirectory/"+file.path+"/"+req.name, function (err) {
-          if (err) throw err;
-          console.log('File ' +file.name +' renamed to: ' +req.name);
-        })
-      });
+      try {
+        fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
+          if (err) {
+              return console.error(err);
+          }         
+          fs.rename(__dirname+"/../userDirectory/"+file.path+"/"+file.name, __dirname+"/../userDirectory/"+file.path+"/"+req.name, function (err) {
+            if (err) throw err;
+            console.log('File ' +file.name +' renamed to: ' +req.name);
+            callback(res, finalResponse);
+          })
+        });
+      } catch (error) {
+      finalResponse.message="Error";
+      callback(res,finalResponse);
+      }
     });  
   }else{
     FilePermissions.findOne({fileId:req.fileId, userId:userid, write: true}).exec(function(err, filePerm){
-      if(Object.keys(filePerm).length !== 0){ // If query return something
-        File.findByIdAndUpdate(req.fileId, newvalues,  function(err,file) {
-          if(err) throw err;
-          fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
-            if (err) {
-                return console.error(err);
-            }         
-            fs.rename(__dirname+"/../userDirectory/"+file.path+"/"+file.name, __dirname+"/../userDirectory/"+file.path+"/"+req.name, function (err) {
-              if (err) throw err;
-              console.log('File ' +file.name +' renamed to: ' +req.name);
-            })
-          });
-        });  
+      try {
+        if(Object.keys(filePerm).length !== 0){ // If query return something
+          File.findByIdAndUpdate(req.fileId, newvalues,  function(err,file) {
+            if(err) throw err;
+            fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
+              if (err) {
+                  return console.error(err);
+              }         
+              fs.rename(__dirname+"/../userDirectory/"+file.path+"/"+file.name, __dirname+"/../userDirectory/"+file.path+"/"+req.name, function (err) {
+                if (err) throw err;
+                console.log('File ' +file.name +' renamed to: ' +req.name);
+                callback(res, finalResponse);
+              })
+            });
+          });  
+        }
+        
+      } catch (error) {
+      finalResponse.message="Error";
+      callback(res,finalResponse);
       }
     });
   }

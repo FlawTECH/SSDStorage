@@ -13,6 +13,8 @@ const filePermissions = require("../models/filePermissions.model");
 const mongoose = require('mongoose');
 const fs = require('fs-extra');
 const jszip = require('jszip');
+const he = require('he');
+
 
 module.exports = router;
 
@@ -43,17 +45,17 @@ function moveFile(req,res) {
   res.json(moveFile);
 }
 
-function renameFile(req,res) {
-  let renameFile = fileCtrl.renameFile(req);
-  res.json(renameFile);
+async function renameFile(req,res) {
+  req.body.name = he.encode(req.body.name.replace('/',''));
+  await fileCtrl.renameFile(req, res, FileCallback); 
 }
 
 async function deleteFile(req,res) {
-  await fileCtrl.deleteFile(req, res, deleteFileCallback);  
+  await fileCtrl.deleteFile(req, res, FileCallback);  
 }
 
-function deleteFileCallback(res, deleteFile) {
-  res.json(deleteFile);
+function FileCallback(res, info) {
+  res.json(info);
 }
 
 async function insert(req, res) {
