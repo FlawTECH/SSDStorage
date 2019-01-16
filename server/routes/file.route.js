@@ -33,12 +33,25 @@ router.route('/rename')
   .put(asyncHandler(renameFile));
 router.route('/move')
   .put(asyncHandler(moveFile));
+router.route('/generate')
+  .post(asyncHandler(generateGroup));
+router.route('/download')
+  .post(asyncHandler(download));
 
+// router.get('/download/:fileName', function(req, res){
+//   console.log()
+//     var file = __dirname + '/../userDirectory/'+req.params.fileName;
+//     res.download(file);
+//   });
 
-router.get('/download/:fileName', function(req, res){
-    var file = __dirname + '/../userDirectory/'+req.params.fileName;
-    res.download(file);
-  });
+async function download(req,res) {
+  var file = __dirname + '/../userDirectory/'+req.body.path;
+  res.download(file);
+}
+
+async function generateGroup(req,res) {
+  await fileCtrl.generateGroup(req, res, FileCallback); 
+}
 
 function moveFile(req,res) {
   let moveFile = fileCtrl.moveFile(req);

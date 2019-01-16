@@ -2,7 +2,9 @@ const Joi = require('joi');
 const Group = require('../models/group.model');
 
 const GroupSchema = Joi.object({
-  name: Joi.string().required()
+  name: Joi.string().required(),
+  fileId: Joi.any().required(),
+  userId: Joi.any().required()
 })
 
 module.exports = {
