@@ -6,6 +6,6 @@
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button (click)="onOkClick(this.newFileName.value)" cdkFocusInitial>Ok</button>
+  <button mat-button cdkFocusInitial (click)="onNoClick()">No Thanks</button>
+  <button mat-button (click)="onOkClick(this.newFileName.value)">Ok</button>
 </div>

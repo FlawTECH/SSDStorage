@@ -22,6 +22,7 @@ import { ManagerComponent } from './components/manager/manager.component';
 import { ListDirectoryComponent } from './components/list-directory/list-directory.component';
 import { WaitingComponent } from './components/waiting/waiting.component';
 import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-file/dialog-rename-file.component';
+import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-file/dialog-delete-file.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-fi
     ListDirectoryComponent,
     WaitingComponent,
     DialogRenameFileComponent,
+    DialogDeleteFileComponent,
   ],
   imports: [
     BrowserModule,
@@ -55,7 +57,10 @@ import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-fi
     useClass: CatchErrorInterceptor,
     multi: true,
   }],
-  entryComponents: [DialogRenameFileComponent],
+  entryComponents: [
+    DialogRenameFileComponent,
+    DialogDeleteFileComponent
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

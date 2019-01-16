@@ -52,7 +52,13 @@ export class FileService {
     return this.http.put(this.linkApi+"/rename",{
       "name": newFileName,
       "fileId": fileId
-    })
+    });
+  }
+
+  deleteFile(fileId:String):Observable<any> {
+    return this.http.put(this.linkApi+"/delete",{
+      "fileId": fileId
+    });
   }
 }
 

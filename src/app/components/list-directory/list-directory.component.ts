@@ -6,6 +6,7 @@ import { tokenKey } from '@angular/core/src/view';
 import { saveAs } from 'file-saver';
 import { MatDialog } from '@angular/material';
 import { DialogRenameFileComponent } from '../dialogs/dialog-rename-file/dialog-rename-file.component';
+import { DialogDeleteFileComponent } from '../dialogs/dialog-delete-file/dialog-delete-file.component';
 
 
 @Component({
@@ -150,6 +151,22 @@ export class ListDirectoryComponent implements OnInit,OnChanges {
       //console.log(result);
       
       //this.fileService.renameFile(result.)
+    });
+  }
+
+  deleteFile(file:File,index:number){
+    const dialogRef = this.dialog.open(DialogDeleteFileComponent,{
+      width: '500px',
+      data:{
+        file:file,
+        index:index,
+        userFileList : this.userFileList
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+
+     
     });
   }
   
