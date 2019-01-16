@@ -4,7 +4,7 @@ import { Injectable } from "@angular/core";
 
 @Injectable()
 export class AdminService {
-    private url = 'http://localhost:4040/api/'
+    private url = '/api/'
 
     constructor (private http: HttpClient) {}
 

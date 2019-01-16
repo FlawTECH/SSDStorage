@@ -7,7 +7,7 @@ import * as jwtDecode from 'jwt-decode';
   providedIn: 'root'
 })
 export class FileService {
-  private linkApi = 'http://localhost:4040/api/file';
+  private linkApi = '/api/file';
   private token;
 
   constructor(private http: HttpClient) {
