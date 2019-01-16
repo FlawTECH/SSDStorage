@@ -4,6 +4,7 @@ const FilePermissions = require('../models/filePermissions.model');
 const jwtDecode = require("jwt-decode");
 const User = require('../models/user.model');
 const fs = require('fs');
+const shortid = require('shortid');
 
 
 const FileSchema = Joi.object({
@@ -16,7 +17,22 @@ module.exports = {
   insert,
   deleteFile,
   renameFile,
-  moveFile
+  moveFile,
+  generateGroup
+}
+
+function generateGroup(req,res,callback) {  // Receive fileId + name
+  var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
+  var userid = decoded._id;
+  req = req.body;
+  var finalResponse = Object.assign({
+    'message': "Success",
+    'url' : "notEmpty"
+  });
+  finalResponse.url = shortid.generate();
+  console.log(finalResponse.url)
+  callback(res,finalResponse);
+
 }
 
 function moveFile(req,res) {  // Receive FileObject with new path
