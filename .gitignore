@@ -44,7 +44,7 @@ testem.log
 Thumbs.db
 
 # Env file
-*.env
+# *.env
 
 # Upload directory
 /server/userDirectory
