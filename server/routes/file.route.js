@@ -33,8 +33,6 @@ router.route('/rename')
   .put(asyncHandler(renameFile));
 router.route('/move')
   .put(asyncHandler(moveFile));
-router.route('/generate')
-  .post(asyncHandler(generateGroup));
 router.route('/download')
   .post(asyncHandler(download));
 
@@ -49,9 +47,6 @@ async function download(req,res) {
   res.download(file);
 }
 
-async function generateGroup(req,res) {
-  await fileCtrl.generateGroup(req, res, FileCallback);
-}
 
 function moveFile(req,res) {
   let moveFile = fileCtrl.moveFile(req);

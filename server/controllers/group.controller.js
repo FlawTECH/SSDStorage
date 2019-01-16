@@ -29,7 +29,6 @@ function generateGroup(req,res,callback) {
 newGroup.then(function(result) {
   callback(res, result);
 })
-
 }
 
 
