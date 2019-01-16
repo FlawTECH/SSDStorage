@@ -48,8 +48,11 @@ function renameFile(req,res) {
   res.json(renameFile);
 }
 
-function deleteFile(req,res) {
-  let deleteFile = fileCtrl.deleteFile(req);
+async function deleteFile(req,res) {
+  await fileCtrl.deleteFile(req, res, deleteFileCallback);  
+}
+
+function deleteFileCallback(res, deleteFile) {
   res.json(deleteFile);
 }
 
