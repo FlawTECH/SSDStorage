@@ -20,25 +20,22 @@ router.post('/login', passport.authenticate('local', { session: false }), login)
 router.get('/me', passport.authenticate('jwt', { session: false }), login);
 
 async function register(req, res, next) {
-  try {
-    getSecret(req.body.tmpId).then(secret => { // remettre en await
-      req.body.secret = secret;
-      delete req.body.tmpId;
-      const otp = req.body.otp
-      delete req.body.otp;
-      
-      userCtrl.insert(req.body).then(user => {
-        user = user.toObject();
-        delete user.hashedPassword;
-        req.user = user;
-        req.body.otp = otp
-        req.body.isRegistered = true
-        next()
-      })
-    })
-  } catch (error) {
-    res.status(400).json({error: error.message})
-  }
+  getSecret(req.body.tmpId).then(async secret => {
+    req.body.secret = secret;
+    delete req.body.tmpId;
+    delete req.body.otp;
+    const otp = req.body.otp
+    let user = await userCtrl.insert(req.body)
+
+    user = user.toObject();
+    delete user.hashedPassword;
+    req.user = user;
+    req.body.otp = otp
+    req.body.isRegistered = true
+    next()
+  }).catch(err => {
+    res.status(400).json({error: err.message})
+  })
 }
 
 async function getSecret(id) {
@@ -49,8 +46,7 @@ async function getSecret(id) {
       const data = line.split(':')
       
       if (data[0] == id){
-        resolve(data[1])
-        //delete line
+        resolve(data[1])//delete line afterward
       }
     });
   })
@@ -61,7 +57,6 @@ async function generatesQr(req, res) {
   const qrcode_uri = await qrcode.toDataURL(secret.otpauth_url);
   const id = uniqid();
   fs.appendFileSync('secret.tmp', id + ':' + secret.base32 + '\n');
-  testToken(secret)
   res.json({id, qrcode_uri})
 }
 
@@ -86,13 +81,12 @@ function checkToken(req, res) {
       }
     }
   });
-
 }
 
 async function login(req, res) {
   const user = req.user;
   const token = authCtrl.generateToken(user);
-  const secret = await authCtrl.getOTP(user.fullname)
+  const secret = await authCtrl.getOTP(user.fullname);
 
   if (!req.body.isRegistered) {
     const verified = speakeasy.totp.verify({
