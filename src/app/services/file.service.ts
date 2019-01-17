@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver';
 })
 export class FileService {
   private linkApi = '/api/file';
+  private linkApi2 = '/api/group';
   private token;
 
   constructor(private http: HttpClient) {
@@ -23,11 +24,16 @@ export class FileService {
     })
   }
 
+  generateGroup(fileId: string): Observable<any> {
+    console.log('debug', fileId)
+    return this.http.post('/api/group/generate', {fileId});
+  }
+
    //POST a file
-   postFile(formData: FormData): Observable<any> {
-    return this.http.post(this.linkApi, formData, {
-      //params: new HttpParams().set('path', path.toString())
-    });
+  postFile(formData: FormData): Observable<any> {
+  return this.http.post(this.linkApi, formData, {
+    //params: new HttpParams().set('path', path.toString())
+  });
   }
 
   //POST a folder

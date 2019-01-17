@@ -23,6 +23,7 @@ import { ListDirectoryComponent } from './components/list-directory/list-directo
 import { WaitingComponent } from './components/waiting/waiting.component';
 import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-file/dialog-rename-file.component';
 import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-file/dialog-delete-file.component';
+import { MatSnackBarModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-fi
     AppRoutingModule,
     MatGridListModule,
     MatRadioModule,
+    MatSnackBarModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

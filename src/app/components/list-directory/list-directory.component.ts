@@ -4,7 +4,7 @@ import { File } from '../../class/file';
 import * as jwtDecode from 'jwt-decode';
 import { tokenKey } from '@angular/core/src/view';
 import { saveAs } from 'file-saver';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { DialogRenameFileComponent } from '../dialogs/dialog-rename-file/dialog-rename-file.component';
 import { DialogDeleteFileComponent } from '../dialogs/dialog-delete-file/dialog-delete-file.component';
 
@@ -22,10 +22,19 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
   @Input()
   public currentPath: String = "/" + this.token.fullname;
 
-  constructor(private fileService: FileService, public dialog: MatDialog) {}
+  constructor(private fileService: FileService, public dialog: MatDialog, private snackBar: MatSnackBar) {}
   
   ngOnChanges(changes){
     console.log('Changed', changes.currentPath.currentValue, changes.currentPath.previousValue);
+  }
+  
+  generateGroup(file: File) {
+    console.log(window.location.origin)
+    this.fileService.generateGroup(file.id).subscribe(res => {
+      this.snackBar.open(window.location.origin + '/api/group/generate' + res.name, 'Close', {
+        duration : 5000
+      })
+    });
   }
   
   ngOnInit() {
@@ -35,10 +44,10 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
         if(res){
           res.forEach(element => {
             
-            if(element.file.type ==="f" && element.read == true){
+            if (element.file.type === "f" && element.read == true) {
               
               this.userFileList.push(File.fromJSON(element.file));
-            }else if (element.file.type == "d" && element.read == true ){
+            } else if (element.file.type == "d" && element.read == true ){
               this.userFolderList.push(File.fromJSON(element.file));
             }
           });
@@ -48,7 +57,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
     )
   }
 
-  clickOnDirectory(file:File){
+  clickOnDirectory(file: File){
     
     if (file.name != "...") {
       this.fileService.getFile(file.path+"/"+file.name).subscribe(result=>{
