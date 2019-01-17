@@ -14,11 +14,12 @@ export class AuthService {
 
   public $userSource = new Subject<any>();
 
-  login(fullname : string, password : string) : Observable <any> {
+  login(fullname : string, password : string, otp: string) : Observable <any> {
     return Observable.create(observer => {
       this.http.post('/api/auth/login', {
         fullname,
-        password
+        password,
+        otp
       }).subscribe((data : any) => {
           observer.next({user: data.user});
           this.setUser(data.user);
@@ -29,14 +30,18 @@ export class AuthService {
   }
 
   register(fullname : string,  password : string, repeatPassword : string, status: string = "Waiting") : Observable <any> {
+    const tmpId = (<any>window).tmpId;
+    const otp = (<any>window).otp;
     const roles = []
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
         fullname,
         status,
-        roles,
         password,
-        repeatPassword
+        roles,
+        tmpId,
+        repeatPassword,
+        otp
       }).subscribe((data : any) => {
         observer.next({user: data.user});
         this.setUser(data.user);
@@ -53,7 +58,6 @@ export class AuthService {
     
     this.$userSource.next(user);
     (<any>window).user = user;
-    console.log("setuser", (<any>window).user)
   }
 
   getUser(): Observable<any> {
@@ -70,6 +74,26 @@ export class AuthService {
         observer.complete();
       })
     });
+  }
+
+  getQrCode(): Observable<any> {
+    return Observable.create(observer => {
+      this.http.get('/api/auth/qrcode').subscribe((data: any) => {
+        observer.next({tmpId: data.id, qrcode: data.qrcode_uri});
+        (<any>window).tmpId = data.id;
+        observer.complete()
+      })
+    })
+  }
+
+  checkToken(token: string, id: string): Observable<any> {
+    (<any>window).otp = token;
+    return Observable.create(observer => {
+      this.http.post('/api/auth/token', {token, id}).subscribe((data: any) => {
+        observer.next(data);
+        observer.complete();
+      })
+    })
   }
 
   signOut(): void {

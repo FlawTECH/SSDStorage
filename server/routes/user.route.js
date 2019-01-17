@@ -5,6 +5,8 @@ const userCtrl = require('../controllers/user.controller');
 const requireAdmin = require('../middleware/require-admin')
 const router = express.Router();
 const WrongStatusError = require('../errors').WrongStatusError
+const readline = require('readline');
+const fs = require('fs');
 
 router.use(passport.authenticate('jwt', { session: false }))
 
@@ -15,7 +17,6 @@ router.route('/')
 
 async function insert(req, res) { // might have to delete this function later since it's not used atm
   const user = await userCtrl.insert(req.body);
-  console.log("test: "+req.body)
   res.json(user);
 }
 
@@ -35,8 +36,8 @@ async function setStatus(req, res) {
             return res.status(500).json({error: err.message})
       }
     }
-    return res.status(200).end()
 
+    return res.status(200).end()
   })
 }
 

@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators, ValidationErrors } from '@angular/forms';
-
-
 import {AuthService} from '../auth.service';
 
 @Component({
@@ -41,13 +39,13 @@ export class RegisterComponent implements OnInit {
     let {
       pseudo,
       password,
-      repeatPassword
+      repeatPassword,
     } = this.userForm.getRawValue();
 
     this.authService.register(pseudo, password, repeatPassword)
-    .subscribe(data => {
-      this.router.navigate(['manager']);
-    })
+      .subscribe(data => {
+        this.router.navigate(['manager']);
+      })
   }
 
 }

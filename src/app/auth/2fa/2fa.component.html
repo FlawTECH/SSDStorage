@@ -1,0 +1,14 @@
+<mat-card class="example-card">
+    <mat-card-header>
+        <mat-card-title>Please scan the following qrcode with an authentication app, then enter the resulting token </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <img src={{qrcode}}>
+        <form class="example-form" (ngSubmit)="onSubmit()">
+            <mat-form-field>
+                <input matInput placeholder="Token" name="token" required [(ngModel)]="token">
+            </mat-form-field>
+            <button mat-raised-button type="submit">Validate</button>
+        </form>
+    </mat-card-content>
+</mat-card>

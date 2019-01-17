@@ -48,4 +48,6 @@ Thumbs.db
 
 # Upload directory
 /server/userDirectory
-package-lock.json
+secret\.tmp
+
+package-lock\.json

@@ -12,6 +12,7 @@ const userSchema = Joi.object({
   password: Joi.string().required().min(10).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/),// au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial
   repeatPassword: Joi.string().required().valid(Joi.ref('password')),
   roles: Joi.array().required(),
+  secret: Joi.string().required()
 })
 
 const states = {
@@ -28,6 +29,7 @@ async function insert(user) {
   user = await Joi.validate(user, userSchema, { abortEarly: false });
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
+  user.secret;
   return await new User(user).save();
 }
 
@@ -82,7 +84,7 @@ function createDirectory(doc) {
   fullname = doc.fullname;
   var dir = __dirname + "/../userDirectory/"+ fullname;
   if (!fs.existsSync(dir)){
-  fs.mkdirSync(dir);
+    fs.mkdirSync(dir);
   }
 }
 

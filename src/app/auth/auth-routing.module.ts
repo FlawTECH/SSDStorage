@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import {LoginComponent} from './login/login.component';
-import {RegisterComponent} from './register/register.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 import { IsLoggedInGuard } from '../guards/is-logged-in.guard';
+import { TwoFactorAuthenticationComponent } from './2fa/2fa.component'
 
 const routes: Routes = [{
   path: 'auth',
@@ -20,7 +21,11 @@ const routes: Routes = [{
     path: 'register',
     component: RegisterComponent,
     canActivate:[IsLoggedInGuard],
-  }]
+  }, {
+    path: '2fa',
+    component: TwoFactorAuthenticationComponent,
+  }
+]
 }];
 
 @NgModule({

@@ -14,9 +14,9 @@ const localLogin = new LocalStrategy({
   if (!user || !bcrypt.compareSync(password, user.hashedPassword)) {
     return done(null, false, { error: 'Your login details could not be verified. Please try again.' });
   }
+
   user = user.toObject();
   delete user.hashedPassword;
-  console.log(user);
   done(null, user);
 });
 
