@@ -14,11 +14,12 @@ export class AuthService {
 
   public $userSource = new Subject<any>();
 
-  login(fullname : string, password : string) : Observable <any> {
+  login(fullname : string, password : string, otp: string) : Observable <any> {
     return Observable.create(observer => {
       this.http.post('/api/auth/login', {
         fullname,
-        password
+        password,
+        otp
       }).subscribe((data : any) => {
           observer.next({user: data.user});
           this.setUser(data.user);
@@ -29,6 +30,8 @@ export class AuthService {
   }
 
   register(fullname : string,  password : string, repeatPassword : string, status: string = "Waiting") : Observable <any> {
+    const tmpId = (<any>window).tmpId;
+    const otp = (<any>window).otp;
     const roles = []
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
@@ -36,7 +39,9 @@ export class AuthService {
         status,
         password,
         roles,
-        repeatPassword
+        tmpId,
+        repeatPassword,
+        otp
       }).subscribe((data : any) => {
         observer.next({user: data.user});
         this.setUser(data.user);
@@ -82,6 +87,7 @@ export class AuthService {
   }
 
   checkToken(token: string, id: string): Observable<any> {
+    (<any>window).otp = token;
     return Observable.create(observer => {
       this.http.post('/api/auth/token', {token, id}).subscribe((data: any) => {
         observer.next(data);

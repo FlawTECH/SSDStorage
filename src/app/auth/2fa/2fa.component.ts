@@ -21,11 +21,8 @@ export class TwoFactorAuthenticationComponent implements OnInit{
   }
   
   onSubmit() {
-    console.log(this.token)
     this.authService.checkToken(this.token, (<any>window).tmpId).subscribe(res => {
-      // if ok 
-      // this.router.navigate(["auth/register"]);
-      console.log(res)
+      this.router.navigate(["auth/register"]);
     })
   }
 }

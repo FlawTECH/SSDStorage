@@ -21,39 +21,48 @@ router.get('/me', passport.authenticate('jwt', { session: false }), login);
 
 async function register(req, res, next) {
   try {
-    let user = await userCtrl.insert(req.body, secret);
-    user = user.toObject();
-    delete user.hashedPassword;
-    req.user = user;
-    next()
+    getSecret(req.body.tmpId).then(secret => { // remettre en await
+      req.body.secret = secret;
+      delete req.body.tmpId;
+      const otp = req.body.otp
+      delete req.body.otp;
+      
+      userCtrl.insert(req.body).then(user => {
+        user = user.toObject();
+        delete user.hashedPassword;
+        req.user = user;
+        req.body.otp = otp
+        req.body.isRegistered = true
+        next()
+      })
+    })
   } catch (error) {
     res.status(400).json({error: error.message})
   }
 }
 
+async function getSecret(id) {
+  return new Promise(resolve => {
+    readline.createInterface({
+      input: fs.createReadStream('secret.tmp')
+    }).on('line', line => {
+      const data = line.split(':')
+      
+      if (data[0] == id){
+        resolve(data[1])
+        //delete line
+      }
+    });
+  })
+}
+
 async function generatesQr(req, res) {
-  const secret = speakeasy.generateSecret();
+  const secret = speakeasy.generateSecret({name: 'NAS'});
   const qrcode_uri = await qrcode.toDataURL(secret.otpauth_url);
   const id = uniqid();
   fs.appendFileSync('secret.tmp', id + ':' + secret.base32 + '\n');
   testToken(secret)
   res.json({id, qrcode_uri})
-}
-
-function testToken(secret) {
-  // TEST
-  const testToken = speakeasy.totp({
-    secret: secret.base32,
-    encoding: 'base32'
-  })
-
-  const verify = speakeasy.totp.verify({
-    secret: secret.base32,
-    encoding: 'base32',
-    token: testToken.toString()
-  })
-
-  console.log(verify, testToken)
 }
 
 function checkToken(req, res) {
@@ -71,17 +80,33 @@ function checkToken(req, res) {
       });
 
       if (verified) {
-        console.log('Token ok')
-        return res.status(200).end()
+        res.status(200).end()
+      } else {
+        res.status(400).json({error: 'Token is not valid'})
       }
     }
   });
 
-  res.status(400).json({error: 'Token is not valid'})
 }
 
-function login(req, res) {
+async function login(req, res) {
   const user = req.user;
   const token = authCtrl.generateToken(user);
-  res.json({ user, token });
+  const secret = await authCtrl.getOTP(user.fullname)
+
+  if (!req.body.isRegistered) {
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: req.body.otp
+    })
+  
+    if (verified) {
+      res.json({ user, token });
+    } else {
+      res.status(401).json({error: 'One time password incorrect'})
+    }
+  } else {
+    res.json({ user, token })
+  }
 }

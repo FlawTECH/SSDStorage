@@ -14,12 +14,13 @@ export class LoginComponent implements OnInit {
 
   pseudo: string;
   password: string;
+  token: string;
 
   ngOnInit() {
   }
 
   login(): void {
-    this.authService.login(this.pseudo, this.password)
+    this.authService.login(this.pseudo, this.password, this.token)
       .subscribe(data => {
         this.router.navigate(['manager']);
       })

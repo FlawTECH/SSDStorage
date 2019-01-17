@@ -12,6 +12,7 @@ const userSchema = Joi.object({
   password: Joi.string().required(),
   repeatPassword: Joi.string().required().valid(Joi.ref('password')),
   roles: Joi.array().required(),
+  secret: Joi.string().required()
 })
 
 const states = {
@@ -28,8 +29,7 @@ async function insert(user) {
   user = await Joi.validate(user, userSchema, { abortEarly: false });
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
-  user.secret = secret.base32
-  console.log(user.secret)
+  user.secret;
   return await new User(user).save();
 }
 
