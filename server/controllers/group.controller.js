@@ -37,8 +37,6 @@ function changeStatusGroupFile(req,res, callback) {
       callback(res,finalResponse);
     }   
   });
-
-
 }
 
 
