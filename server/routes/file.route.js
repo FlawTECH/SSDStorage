@@ -296,31 +296,27 @@ async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId,
   try {
     fileCtrl.insert(folder).then(
       insertedFolder => {
-        folder = insertedFolder;
-        Filedb.findOne({
-          name: folder.name
-        }, (err, dbRes) => {
-          folderId = dbRes._id;
-          folder = folder.toObject();
+        folder = insertedFolder.toObject();
+        folderId = folder._id;
 
-          permissionToCreate = {
-            'fileId': folderId,
-            'userId': userId,
-            'read': true,
-            'write': true,
-            'delete': true,
-            'isOwner': true,
-          };
-          persmissionCtrl.insert(permissionToCreate).then(
-            permissionToCreate => {
-                let craftedResponse = {
-                  'file': insertedFolder,
-                  'perm': permissionToCreate
-                }
-                resolve(craftedResponse);
-            }
-          );
-        });
+        permissionToCreate = {
+          'fileId': folderId,
+          'userId': userId,
+          'read': true,
+          'write': true,
+          'delete': true,
+          'isOwner': true,
+        };
+
+        persmissionCtrl.insert(permissionToCreate).then(
+          permissionToCreate => {
+              let craftedResponse = {
+                'file': insertedFolder,
+                'perm': permissionToCreate
+              }
+              resolve(craftedResponse);
+          }
+        );
       }
     );
   }
@@ -353,31 +349,26 @@ async function createFile(fileName, nestedFilePath, filePath, subdirPath, userId
   try {
     fileCtrl.insert(fileToUpload).then(
       insertedFile => {
-        fileToUpload = insertedFile;
-        Filedb.findOne({
-          name: fileToUpload.name
-        }, (err, dbRes) => {
-          fileId = dbRes._id;
-          fileToUpload = fileToUpload.toObject();
+        fileToUpload = insertedFile.toObject();
+        fileId = fileToUpload._id
 
-          permissionToCreate = {
-            'fileId': fileId,
-            'userId': userId,
-            'read': true,
-            'write': true,
-            'delete': true,
-            'isOwner': true,
-          };
-          persmissionCtrl.insert(permissionToCreate).then(
-            permissionToCreate => {
-              let craftedResponse = {
-                'file': insertedFile,
-                'perm': permissionToCreate
-              }
-              resolve(craftedResponse);
+        permissionToCreate = {
+          'fileId': fileId,
+          'userId': userId,
+          'read': true,
+          'write': true,
+          'delete': true,
+          'isOwner': true,
+        };
+        persmissionCtrl.insert(permissionToCreate).then(
+          permissionToCreate => {
+            let craftedResponse = {
+              'file': insertedFile,
+              'perm': permissionToCreate
             }
-          );
-        });
+            resolve(craftedResponse);
+          }
+        );
       }
     );
   }
@@ -412,31 +403,26 @@ async function createFileFromZip(file, fileName, filePath, subdirPath, subdirNam
   try {
     fileCtrl.insert(fileToUpload).then(
       insertedFile => {
-        fileToUpload = insertedFile;
-        Filedb.findOne({
-          name: fileToUpload.name
-        }, (err, dbRes) => {
-          fileId = dbRes._id;
-          fileToUpload = fileToUpload.toObject();
+        fileToUpload = insertedFile.toObject();
+        fileId = fileToUpload._id;
 
-          permissionToCreate = {
-            'fileId': fileId,
-            'userId': userId,
-            'read': true,
-            'write': true,
-            'delete': true,
-            'isOwner': true,
-          };
-          persmissionCtrl.insert(permissionToCreate).then(
-            permissionToCreate => {
-              let craftedResponse = {
-                'file': insertedFile,
-                'perm': permissionToCreate
-              }
-              resolve(craftedResponse);
+        permissionToCreate = {
+          'fileId': fileId,
+          'userId': userId,
+          'read': true,
+          'write': true,
+          'delete': true,
+          'isOwner': true,
+        };
+        persmissionCtrl.insert(permissionToCreate).then(
+          permissionToCreate => {
+            let craftedResponse = {
+              'file': insertedFile,
+              'perm': permissionToCreate
             }
-          );
-        });
+            resolve(craftedResponse);
+          }
+        );
       }
     );
   }
