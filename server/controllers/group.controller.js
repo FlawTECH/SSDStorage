@@ -92,15 +92,17 @@ function generateGroup(req,res,callback) {  //Generate a group name. Create new 
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
   req = req.body;
-  var newGroup =  new Group({
-  "fileId" : req.fileId,
-  "name" : shortid.generate(),
-  "userId" :  userid,
-  "status" : false
-}).save(); 
-newGroup.then(function(result) {
-  callback(res, result);
-})
+
+  const newGroup =  new Group({
+    "fileId" : req.fileId,
+    "name" : shortid.generate(),
+    "userId" :  userid,
+    "status" : false
+  }).save(); 
+
+  newGroup.then(function(result) {
+    callback(res, result);
+  })
 }
 
 

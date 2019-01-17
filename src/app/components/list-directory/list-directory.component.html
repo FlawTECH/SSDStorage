@@ -10,17 +10,20 @@
       <button *ngIf="item.name!='...'" mat-icon-button (click)="deleteFolder(item,i)" color="accent">
         <mat-icon class="mat-18">delete</mat-icon>
       </button>
+      <button mat-icon-button color="primary" (click)="generateGroup(item)">
+        <mat-icon class="mat-18">group</mat-icon>
+      </button>
       <button mat-icon-button (click)="clickOnDirectory(item);" color="primary">
         <mat-icon class="mat-18">visibility</mat-icon>
       </button>
     </mat-list-item>
 
     <mat-list-item *ngFor="let item of userFileList; index as i">
-      <mat-icon mat-list-icon>insert_drive_file</mat-icon>
-      <h4 mat-line>{{item.name}}</h4>
-      <p mat-line> {{item.createdAt | date}} </p>
       <button mat-icon-button (click)="deleteFile(item,i)" color="accent">
         <mat-icon class="mat-18">delete</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="generateGroup(item)">
+        <mat-icon class="mat-18">group</mat-icon>
       </button>
       <button mat-icon-button (click)="openDialog(item,i)" color="primary">
         <mat-icon class="mat-18">edit</mat-icon>
@@ -28,6 +31,9 @@
       <button mat-icon-button (click)="downloadFile(item.path+'/',item.name)" color="primary">
         <mat-icon class="mat-18">cloud_download</mat-icon>
       </button>
+      <mat-icon mat-list-icon>insert_drive_file</mat-icon>
+      <h4 mat-line>{{item.name}}</h4>
+      <p mat-line> {{item.createdAt | date}} </p>
     </mat-list-item>
 
   </mat-list>
