@@ -70,7 +70,6 @@ async function downloadFolder(req, res) {
   fileCtrl.downloadDir(req).then((response => {
     res.download(response);
   })).catch((error) => {
-    console.log(error);
     let response = { 'message': error }
     res.send(response);
   });

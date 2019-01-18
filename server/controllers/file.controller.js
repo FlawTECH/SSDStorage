@@ -222,8 +222,6 @@ function deleteFile(req,res, callback) { // Receive fileId
 }
 
 async function insert(file) {
-
-  console.log('File: ' +file.name+", path:"+file.path);
   file = await Joi.validate(file, FileSchema, { abortEarly: false });
   
   let newFile = await new File(file).save();
@@ -252,6 +250,7 @@ function listFilesFromDir(file, user) {
   return new Promise((resolve, reject) => {
     var fullPathRegexReady = ("/"+file.path+"/"+file.name).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     var combinedPathRegexReady = new RegExp("^"+fullPathRegexReady+"\/?.*");
+    console.log(file);
 
     FilePermissions.aggregate([
       {

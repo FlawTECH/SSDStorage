@@ -53,6 +53,17 @@ export class FileService {
     )
   }
 
+  donwloadFolder(path:String, name:String): Observable<any> {
+    return  this.http.post(this.linkApi+"/downloaddir",
+    {
+      "name": name.toString(),
+      "path": path.toString().substr(1, path.toString().length-2),
+      "type": "d",
+    },
+    {responseType: 'blob'}
+    )
+  }
+
   renameFile(newFileName:String, fileId:String): Observable<any>{
     return this.http.put(this.linkApi+"/rename",{
       "name": newFileName,
