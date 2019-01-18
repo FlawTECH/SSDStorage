@@ -11,6 +11,7 @@ export class ManagerComponent implements OnInit {
   constructor() {
     this.tabs = [
       { path: "directories", label: "directories", isActive: "true" },
+      { path: "file-share", label: "file-share", isActive: "true"}
     ]
   }
 

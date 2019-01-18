@@ -65,6 +65,10 @@ export class FileService {
       "fileId": fileId
     });
   }
+
+  shareFile(link: string): Observable<any> {
+    return this.http.get(link);
+  }
 }
 
   

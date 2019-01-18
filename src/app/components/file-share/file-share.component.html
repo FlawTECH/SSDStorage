@@ -1,0 +1,15 @@
+<div id="container">
+    <mat-card>
+        <mat-card-header>
+            File-share
+        </mat-card-header>
+        <mat-card-content>
+            <form (ngSubmit)="onSubmit()">
+                <mat-form-field>
+                    <input matInput placeholder="Link" name="link" required [(ngModel)]="link"/>
+                </mat-form-field>
+                <button mat-raised-button color="primary" type="submit">Share</button>
+            </form>
+        </mat-card-content>
+    </mat-card> 
+</div>

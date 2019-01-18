@@ -24,6 +24,7 @@ import { WaitingComponent } from './components/waiting/waiting.component';
 import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-file/dialog-rename-file.component';
 import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-file/dialog-delete-file.component';
 import { MatSnackBarModule } from '@angular/material';
+import { FileShareComponent } from './components/file-share/file-share.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { MatSnackBarModule } from '@angular/material';
     WaitingComponent,
     DialogRenameFileComponent,
     DialogDeleteFileComponent,
+    FileShareComponent
   ],
   imports: [
     BrowserModule,

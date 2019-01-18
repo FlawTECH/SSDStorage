@@ -31,7 +31,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
   generateGroup(file: File) {
     console.log(window.location.origin)
     this.fileService.generateGroup(file.id).subscribe(res => {
-      this.snackBar.open(window.location.origin + '/api/group/generate' + res.name, 'Close', {
+      this.snackBar.open(window.location.origin + '/api/group/' + res.name, 'Close', {
         duration : 5000
       })
     });
