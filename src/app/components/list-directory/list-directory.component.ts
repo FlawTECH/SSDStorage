@@ -59,7 +59,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
 
   clickOnDirectory(file: File){
     
-    if (file.name != "...") {
+    if (file.name != "..") {
       this.fileService.getFile(file.path+"/"+file.name).subscribe(result=>{
         if (result) {
           this.userFileList = [];
@@ -73,7 +73,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
           this.currentPath = this.currentPath.substr(1,leng -1)
           console.log(leng)
 
-          this.userFolderList.push(new File("...",previous))
+          this.userFolderList.push(new File("..",previous))
           result.forEach(element => {
             
             if(element.file.type ==="f" && element.read == true){
@@ -101,7 +101,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
             var previous = arr.join("/");
             
             console.log("path: "+file.path)
-            this.userFolderList.push(new File("...",previous))
+            this.userFolderList.push(new File("..",previous))
           }
 
           result.forEach(element => {
