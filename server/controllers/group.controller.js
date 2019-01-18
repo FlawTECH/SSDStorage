@@ -2,7 +2,7 @@ const Joi = require('joi');
 const Group = require('../models/group.model');
 const jwtDecode = require("jwt-decode");
 const shortid = require('shortid');
-
+const serverInstance = require("../index");
 
 
 const GroupSchema = Joi.object({
@@ -49,6 +49,7 @@ function displayFileGroup(req,res, callback) {
 
 // POST localhost:4040/api/changeStatusGroupFile with fileId and name of the group
 function changeStatusGroupFile(req,res, callback) {
+  serverInstance.getio().emit("message",req.body);
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
   var finalResponse = Object.assign({
@@ -56,7 +57,7 @@ function changeStatusGroupFile(req,res, callback) {
   });
   Group.findOneAndUpdate({fileId:req.body.fileId, name:req.body.name, userId:userid}, {$set:{status: true}},  function(err,status) {
     try {
-      if(Object.keys(status).length !== 0){
+      if(Object.keys(status).length !== 0){       
         callback(res, finalResponse);
       }
     } catch (error) {
@@ -76,6 +77,7 @@ function checkStatusDownloadFile(req,res,callback) {
     nbUserNeeded = Math.round(nbUser/2);
     Group.find({fileId:req.body.fileId, name:req.body.name,status: true}).countDocuments().exec(function(err, nbStatusTrue){
       if(nbStatusTrue >= nbUserNeeded){
+        console.log("CA FONCTIONNE")
         callback(res, finalResponse);
       }else{
         finalResponse.message="Error";
