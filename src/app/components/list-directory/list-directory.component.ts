@@ -31,9 +31,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
   generateGroup(file: File) {
     console.log(window.location.origin)
     this.fileService.generateGroup(file.id).subscribe(res => {
-      this.snackBar.open(res.name, 'Close', {
-        duration : 5000
-      })
+      this.snackBar.open(res.name, 'Close')
     });
   }
   
@@ -55,6 +53,12 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
         }
       }
     )
+  }
+
+  copyToClipboard(inputElement) {
+    inputElement.select();
+    document.execCommand('copy');
+    inputElement.setSelectionRange(0,0);
   }
 
   clickOnDirectory(file: File){

@@ -1,17 +1,19 @@
-#container{
+#container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     
-    #share {
-        mat-card {
-            width: 50%;
-            
-           mat-form-field {
-               width: 80%;
-           }
+    table {
+        width: 100%;
+
+        #share {
+            display: flex;
+            justify-content: center;
+        }
+
+        button {
+            margin-left: 10px;
         }
     }
-    
 }

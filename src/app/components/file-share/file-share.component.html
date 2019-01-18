@@ -1,28 +1,37 @@
 <div id="container">
-    <div id="share">
-        <mat-card>
-            <mat-card-header>
-                File-share
-            </mat-card-header>
-            <mat-card-content>
-                <form (ngSubmit)="onSubmit()">
-                    <mat-form-field>
-                        <input matInput placeholder="Link" name="link" required [(ngModel)]="link"/>
-                    </mat-form-field>
-                    <button mat-raised-button color="primary" type="submit">Share</button>
-                </form>
-            </mat-card-content>
-        </mat-card>
-    </div>
+        <table>
+            <tr>
+                <td id="share">
+                    <mat-card>
+                        <mat-card-header>
+                            File-share
+                        </mat-card-header>
+                        <mat-card-content>
+                            <form (ngSubmit)="onSubmit()">
+                                <mat-form-field>
+                                    <input matInput placeholder="Link" name="link" required [(ngModel)]="link"/>
+                                </mat-form-field>
+                                <button mat-raised-button color="primary" type="submit">Join</button>
+                            </form>
+                        </mat-card-content>
+                    </mat-card>
+                </td>
+            </tr>
+            <tr>
+                <td id="share-list">
+                    <mat-list>
+                        <mat-list-item *ngFor="let file of files">
+                            <div>
+                                {{file.name}}
+                                <mat-icon class="mat-18" *ngIf="!file.status">lock</mat-icon>
+                                <mat-icon class="mat-18" *ngIf="file.status">lock_open</mat-icon>
+                            </div>
+                            <button mat-flat-button color="primary" (click)="approveShare(file.fileId, file.name)">Approve</button>
+                            <mat-divider></mat-divider>
+                        </mat-list-item>
+                    </mat-list>
+                </td>
+            </tr>
+        </table>
 
-    <mat-list>
-        <mat-list-item *ngFor="let file of files">
-            <div>
-                {{file.name}}
-                <mat-icon class="mat-18" *ngIf="!file.status">lock</mat-icon>
-                <mat-icon class="mat-18" *ngIf="file.status">lock_open</mat-icon>
-            </div>
-            <mat-divider></mat-divider>
-        </mat-list-item>
-    </mat-list>
 </div>

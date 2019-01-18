@@ -72,6 +72,13 @@ export class FileService {
   getAllSharedFiles(): Observable<any> {
     return this.http.get('api/group/displayFileGroup');
   }
+
+  approveShare(fileId: string, groupName: string): Observable<any> {
+    return this.http.post('api/group/checkStatusDownloadFile', {
+      fileId,
+      groupName
+    });
+  }
 }
 
   

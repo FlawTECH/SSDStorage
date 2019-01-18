@@ -14,14 +14,19 @@ export class FileShareComponent implements OnInit{
     ngOnInit(): void {
         this.fileService.getAllSharedFiles().subscribe(res => {
             this.files = res.fileGroup;
-            console.log(this.files)
+            console.log("ngOninit", this.files)
         })
     }
 
     onSubmit(){
-        console.log("submit")
         this.fileService.shareFile(window.location.origin + '/api/group/' + this.link).subscribe(res => {
             console.log(res)
         })
+    }
+
+    approveShare(fileId: string, groupName: string) {
+        this.fileService.approveShare(fileId, groupName).subscribe(res => {
+            console.log(res)
+        });
     }
 }
