@@ -17,7 +17,34 @@ module.exports = {
   generateGroup,
   joinGroup,
   checkStatusDownloadFile,
-  changeStatusGroupFile
+  changeStatusGroupFile,
+  displayFileGroup
+}
+
+// POST localhost:4040/api/displayFileGroup  
+function displayFileGroup(req,res, callback) {
+  var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
+  var userid = decoded._id;
+  let message = "Success"
+  
+  Group.find({userId:userid}).exec(function(err, fileGroup){
+    try {
+      if(Object.keys(fileGroup).length !== 0){
+        var finalResponse = Object.assign({
+          'fileGroup': fileGroup,
+          'message': message
+        });
+        callback(res, finalResponse);
+      }
+    } catch (error) {
+      var finalResponse = Object.assign({
+        'message': message
+      });
+      finalResponse.message="Error";
+      callback(res,finalResponse);
+    }   
+  });
+
 }
 
 // POST localhost:4040/api/changeStatusGroupFile with fileId and name of the group

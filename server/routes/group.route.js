@@ -16,10 +16,16 @@ router.route('/checkStatusDownloadFile')
   .post(asyncHandler(checkStatusDownloadFile)); 
 router.route('/changeStatusGroupFile')
   .post(asyncHandler(changeStatusGroupFile));
+router.route('/displayFileGroup')
+  .post(asyncHandler(displayFileGroup));
 
 router.get('/:groupName', function(req, res){
     asyncHandler(joinGroup(req,res));
     });
+
+async function displayFileGroup(req,res) {
+  await groupCtl.displayFileGroup(req, res, GroupCallback);
+}
 
 async function changeStatusGroupFile(req,res) {
   await groupCtl.changeStatusGroupFile(req, res, GroupCallback);
