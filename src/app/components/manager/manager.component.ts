@@ -7,16 +7,23 @@ import * as jwtDecode from "jwt-decode";
   styleUrls: ['./manager.component.scss']
 })
 export class ManagerComponent implements OnInit {
-  public tabs = [];
+  private adminTabs = [];
+  private userTabs = [];
+  private isAdmin:boolean;
   private token;
   constructor() {
     this.token = jwtDecode(localStorage.getItem("AuthToken"));
-    
-    this.tabs = [
+    this.isAdmin = this.token.roles.indexOf('admin') >-1;
+    this.adminTabs = [
       { path: "directories", label: "directories", isActive: "true" },
       { path: "file-share", label: "file-share", isActive: "false"},
       { path: "admin", label: "user-validation",isActive: "false"}
       
+    ];
+
+    this.userTabs = [
+      { path: "directories", label: "directories", isActive: "true" },
+      { path: "file-share", label: "file-share", isActive: "false"},      
     ];
   }
 
