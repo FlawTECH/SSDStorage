@@ -25,7 +25,7 @@ export class RegisterComponent implements OnInit {
   userForm = new FormGroup({
     pseudo: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required, Validators.minLength(10),
-       Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$")]), // au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial
+       Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$")]), // au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial
     repeatPassword: new FormControl('', [Validators.required, this.passwordsMatchValidator])
   })
 
