@@ -7,11 +7,15 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { User } from '../../class/user';
 import { ListDirectoryComponent } from '../list-directory/list-directory.component';
 import { File } from '../../class/file';
+import { animations } from '../../animations/animations';
 
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
-  styleUrls: ['./file-upload.component.scss']
+  styleUrls: ['./file-upload.component.scss'],
+  animations: [
+    animations,
+  ]
 })
 export class FileUploadComponent implements OnInit {
  
@@ -362,9 +366,5 @@ export class FileUploadComponent implements OnInit {
   collapsed() {
     this.gridState = "collapsed"
   }
-  setBackToUnchecked() {
-    if (this.shakeAnimation === 'invalid') {
-      this.shakeAnimation = 'unchecked';
-    }
-  }
+  
 }
