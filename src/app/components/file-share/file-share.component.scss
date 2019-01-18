@@ -4,11 +4,14 @@
     align-items: center;
     height: 100%;
     
-    mat-card {
-        width: 50%;
-        
-       mat-form-field {
-           width: 80%;
-       }
+    #share {
+        mat-card {
+            width: 50%;
+            
+           mat-form-field {
+               width: 80%;
+           }
+        }
     }
+    
 }

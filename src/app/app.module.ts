@@ -23,7 +23,7 @@ import { ListDirectoryComponent } from './components/list-directory/list-directo
 import { WaitingComponent } from './components/waiting/waiting.component';
 import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-file/dialog-rename-file.component';
 import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-file/dialog-delete-file.component';
-import { MatSnackBarModule } from '@angular/material';
+import { MatSnackBarModule, MatDividerModule } from '@angular/material';
 import { FileShareComponent } from './components/file-share/file-share.component';
 
 @NgModule({
@@ -50,7 +50,8 @@ import { FileShareComponent } from './components/file-share/file-share.component
     AppRoutingModule,
     MatGridListModule,
     MatRadioModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatDividerModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

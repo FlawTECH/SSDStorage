@@ -8,16 +8,19 @@ import { FileService } from "../../services/file.service";
 })
 export class FileShareComponent implements OnInit{
     link: string;
-
+    files: Array<Object>
     constructor(private fileService: FileService){}
 
     ngOnInit(): void {
-
+        this.fileService.getAllSharedFiles().subscribe(res => {
+            this.files = res.fileGroup;
+            console.log(this.files)
+        })
     }
 
     onSubmit(){
         console.log("submit")
-        this.fileService.shareFile(this.link).subscribe(res => {
+        this.fileService.shareFile(window.location.origin + '/api/group/' + this.link).subscribe(res => {
             console.log(res)
         })
     }

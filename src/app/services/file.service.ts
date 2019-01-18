@@ -9,7 +9,6 @@ import { saveAs } from 'file-saver';
 })
 export class FileService {
   private linkApi = '/api/file';
-  private linkApi2 = '/api/group';
   private token;
 
   constructor(private http: HttpClient) {
@@ -68,6 +67,10 @@ export class FileService {
 
   shareFile(link: string): Observable<any> {
     return this.http.get(link);
+  }
+
+  getAllSharedFiles(): Observable<any> {
+    return this.http.get('api/group/displayFileGroup');
   }
 }
 
