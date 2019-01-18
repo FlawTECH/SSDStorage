@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators, ValidationErrors } from '@angular/forms';
-
-
 import {AuthService} from '../auth.service';
 
 @Component({
@@ -27,7 +25,7 @@ export class RegisterComponent implements OnInit {
   userForm = new FormGroup({
     pseudo: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required, Validators.minLength(10),
-       Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$")]), // au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial
+       Validators.pattern("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$")]), // au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial
     repeatPassword: new FormControl('', [Validators.required, this.passwordsMatchValidator])
   })
 
@@ -41,13 +39,13 @@ export class RegisterComponent implements OnInit {
     let {
       pseudo,
       password,
-      repeatPassword
+      repeatPassword,
     } = this.userForm.getRawValue();
 
     this.authService.register(pseudo, password, repeatPassword)
-    .subscribe(data => {
-      this.router.navigate(['manager']);
-    })
+      .subscribe(data => {
+        this.router.navigate(['manager']);
+      })
   }
 
 }

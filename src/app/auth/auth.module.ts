@@ -8,6 +8,8 @@ import { RegisterComponent } from './register/register.component';
 import { AuthService } from './auth.service';
 import { TokenStorage } from './token.storage';
 import { AuthRoutingModule } from './auth-routing.module';
+import { TwoFactorAuthenticationComponent } from './2fa/2fa.component';
+import { MatInputModule } from '@angular/material';
 
 
 @NgModule({
@@ -15,10 +17,12 @@ import { AuthRoutingModule } from './auth-routing.module';
     CommonModule,
     SharedModule,
     AuthRoutingModule,
+    MatInputModule
   ],
   declarations: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    TwoFactorAuthenticationComponent,
   ],
   providers: [
     AuthService,
