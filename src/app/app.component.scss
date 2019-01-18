@@ -1,2 +1,6 @@
 .wrapper-app {
 }
+/*Error snackbar*/
+::ng-deep snack-bar-container.error {
+    background-color: #e91e63; 
+  }

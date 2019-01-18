@@ -10,6 +10,8 @@ import { FileUploadComponent } from '../components/file-upload/file-upload.compo
 import { WaitingComponent } from '../components/waiting/waiting.component';
 import { WaitingGuard } from '../guards/waiting.guard';
 import { FileShareComponent } from '../components/file-share/file-share.component';
+import { AdminComponent } from '../admin/admin.component';
+import { OnlyAdminUsersGuard } from '../admin/admin-user-guard';
 
 const routes: Routes = [{
   path:'',
@@ -18,10 +20,10 @@ const routes: Routes = [{
 }, {
   path: 'auth',
   loadChildren: 'app/auth/auth.module#AuthModule',
-}, {
+}, /* {
   path: 'admin',
   loadChildren: 'app/admin/admin.module#AdminModule'
-}, {
+}, */ {
   path: 'waiting',
   component:WaitingComponent,
   canActivate:[WaitingGuard]
@@ -43,7 +45,11 @@ const routes: Routes = [{
     path: 'file-share',
     component: FileShareComponent,
     canActivate: [OpenGuard]
-  }
+  },{
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [OnlyAdminUsersGuard]
+  },
 ]
 }];
 
