@@ -35,6 +35,8 @@ router.route('/move')
   .put(asyncHandler(moveFile));
 router.route('/download')
   .post(asyncHandler(download));
+router.route('/downloaddir')
+  .post(asyncHandler(downloadFolder))
 
 /* router.route('/download')
   .post(asyncHandler(download)); */
@@ -50,7 +52,6 @@ async function download(req,res) {
   res.download(file);
 }
 
-
 function moveFile(req,res) {
   let moveFile = fileCtrl.moveFile(req);
   res.json(moveFile);
@@ -63,6 +64,17 @@ async function renameFile(req,res) {
 
 async function deleteFile(req,res) {
   await fileCtrl.deleteFile(req, res, FileCallback);  
+}
+
+async function downloadFolder(req, res) {
+  fileCtrl.downloadDir(req).then((response => {
+    res.download(response);
+  })).catch((error) => {
+    console.log(error);
+    let response = { 'message': error }
+    res.send(response);
+  });
+  // res.download(zippedFolder)
 }
 
 function FileCallback(res, info) {

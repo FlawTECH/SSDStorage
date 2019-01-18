@@ -3,7 +3,11 @@ const File = require('../models/file.model');
 const FilePermissions = require('../models/filePermissions.model');
 const jwtDecode = require("jwt-decode");
 const User = require('../models/user.model');
-const fs = require('fs');
+const mongoose = require('mongoose');
+const fs = require('fs-extra');
+const jszip = require('jszip');
+const tmp = require('tmp');
+const os = require('os');
 
 
 const FileSchema = Joi.object({
@@ -17,6 +21,7 @@ module.exports = {
   deleteFile,
   renameFile,
   moveFile,
+  downloadDir
 }
 
 
@@ -82,7 +87,6 @@ function moveFile(req,res,callback) {  // Receive FileObject with new path
   }
 
 }
-
 
 function renameFile(req,res,callback) {  // Receive fileId + name
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
@@ -224,4 +228,75 @@ async function insert(file) {
   
   let newFile = await new File(file).save();
   return newFile;
+}
+
+function downloadDir(req) {
+  return new Promise((resolve, reject) => {
+    var baseDir = Joi.validate(req.body, FileSchema, { abortEarly: false });
+    var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
+  
+    listFilesFromDir(baseDir.value, decoded).then((files) => {
+      //Download all files as ZIP
+      if(files.length>0) {
+        var generatedZip = generateZipFromFiles(files, baseDir.value.path+"/"+baseDir.value.name);
+        resolve(generatedZip);
+      }
+      else {
+        reject("No files found or not a directory");
+      }
+    });
+  });
+}
+
+function listFilesFromDir(file, user) {
+  return new Promise((resolve, reject) => {
+    var fullPathRegexReady = ("/"+file.path+"/"+file.name).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    var combinedPathRegexReady = new RegExp("^"+fullPathRegexReady+"\/?.*");
+
+    FilePermissions.aggregate([
+      {
+        "$lookup": {
+          "from": File.collection.name,
+          "localField": "fileId",
+          "foreignField": "_id",
+          "as": "file"
+        }
+      },
+      { "$unwind": "$file" },
+      { "$match": { "$and": [
+        { "userId": new mongoose.Types.ObjectId(user._id) },
+        { "file.path": {"$regex": combinedPathRegexReady } },
+        { "read": true }
+      ]}}
+    ]).then((filesFound) => {
+      resolve(filesFound);
+    });
+  });
+}
+
+function generateZipFromFiles(files, fromDir) {
+  return new Promise((resolve, reject) => {
+    var baseDir =  __dirname+"/../"+"userDirectory";
+    var zip = new jszip();
+
+    for(var i = 0; i<files.length; i++) {
+      if(fs.existsSync(baseDir+files[i].file.path+"/"+files[i].file.name)) {
+        if(files[i].file.type === "d") {
+          zip.folder(files[i].file.path.substr(1, files[i].file.path.length-1)+"/"+files[i].file.name);
+        }
+        else {
+          zip.file(files[i].file.path.substr(1, files[i].file.path.length-1)+"/"+files[i].file.name, fs.readFileSync(baseDir+files[i].file.path+"/"+files[i].file.name));
+        }
+      }
+    }
+
+    var tmpDir = tmp.dirSync(os.tmpdir());
+    fs.ensureDirSync(tmpDir.name+"/"+fromDir.split('/').splice(0, fromDir.split('/').length-1).join('/'));
+
+    zip.generateNodeStream({type:'nodebuffer', streamFiles:true})
+    .pipe(fs.createWriteStream(tmpDir.name+"/"+fromDir+".zip"))
+    .on('finish', function() {
+      resolve(tmpDir.name+"/"+fromDir+".zip");
+    });
+  });
 }
