@@ -15,16 +15,24 @@ export class AuthService {
   public $userSource = new Subject<any>();
 
   login(fullname : string, password : string, otp: string) : Observable <any> {
+    console.log("autservice1");
+    
     return Observable.create(observer => {
       this.http.post('/api/auth/login', {
         fullname,
         password,
         otp
-      }).subscribe((data : any) => {
+      }).subscribe((data : any, ) => {
+          console.log("auth.service: "+data.headers);
+          
           observer.next({user: data.user});
           this.setUser(data.user);
           this.token.saveToken(data.token);
           observer.complete();
+      }, (err:any) => {
+        observer.next({error:err});
+        observer.complete();
+        
       })
     });
   }

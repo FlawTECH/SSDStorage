@@ -25,6 +25,7 @@ import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-fi
 import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-file/dialog-delete-file.component';
 import { MatSnackBarModule, MatDividerModule } from '@angular/material';
 import { FileShareComponent } from './components/file-share/file-share.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { FileShareComponent } from './components/file-share/file-share.component
     MatGridListModule,
     MatRadioModule,
     MatSnackBarModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,
