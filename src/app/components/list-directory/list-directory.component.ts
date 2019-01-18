@@ -16,7 +16,8 @@ import { DialogDeleteFileComponent } from '../dialogs/dialog-delete-file/dialog-
 export class ListDirectoryComponent implements OnInit, OnChanges {
   public userFileList: File[] = [];
   public userFolderList : File[] = [];
-  
+  private dialogWidth: any;
+
   public token = jwtDecode(localStorage.getItem("AuthToken"));
 
   @Input()
@@ -128,9 +129,9 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
 
   openDialog(file:File,index:number){
     console.log(file);
-    
+    this.dialogWidth = (file.name.length * 11)>400?file.name.length*11:400;
     const dialogRef = this.dialog.open(DialogRenameFileComponent, {
-      width: '250px',
+      width: this.dialogWidth+"px",
       data: {
         file: file,
         index:index,
