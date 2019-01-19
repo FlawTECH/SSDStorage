@@ -31,7 +31,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
   generateGroup(file: File) {
     console.log(window.location.origin)
     this.fileService.generateGroup(file.id).subscribe(res => {
-      this.snackBar.open(res.name, 'Close')
+      this.snackBar.open("Copy this string: " + res.name, 'Close')
     });
   }
   
@@ -43,7 +43,6 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
           res.forEach(element => {
             
             if (element.file.type === "f" && element.read == true) {
-              
               this.userFileList.push(File.fromJSON(element.file));
             } else if (element.file.type == "d" && element.read == true ){
               this.userFolderList.push(File.fromJSON(element.file));
@@ -53,12 +52,6 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
         }
       }
     )
-  }
-
-  copyToClipboard(inputElement) {
-    inputElement.select();
-    document.execCommand('copy');
-    inputElement.setSelectionRange(0,0);
   }
 
   clickOnDirectory(file: File){
@@ -80,7 +73,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
           this.userFolderList.push(new File("..",previous))
           result.forEach(element => {
             
-            if(element.file.type ==="f" && element.read == true){
+            if (element.file.type === "f" && element.read == true) {
               
               this.userFileList.push(File.fromJSON(element.file));
             } else if (element.file.type == "d" && element.read == true ) {

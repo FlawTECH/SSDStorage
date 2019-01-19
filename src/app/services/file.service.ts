@@ -30,9 +30,9 @@ export class FileService {
 
    //POST a file
   postFile(formData: FormData): Observable<any> {
-  return this.http.post(this.linkApi, formData, {
-    //params: new HttpParams().set('path', path.toString())
-  });
+    return this.http.post(this.linkApi, formData, {
+      //params: new HttpParams().set('path', path.toString())
+    });
   }
 
   //POST a folder

@@ -149,22 +149,22 @@ function deleteFile(req,res, callback) { // Receive fileId
     FilePermissions.find({fileId:req.fileId}).remove().exec(function(err, filePerm){
       console.log('Filepermissions deleted successfully!');
       try {
-        if(Object.keys(filePerm).length !== 0){
-          File.findByIdAndDelete(req.fileId, function(err,file) {
-            if(err) throw err;
-            console.log('File with Id: '+req.fileId +' deleted in the database!')
+        if (Object.keys(filePerm).length !== 0) {
+          File.findByIdAndDelete(req.fileId, function(err, file) {
+            if (err) throw err;
+            console.log('File with Id: ' + req.fileId + ' deleted in the database!')
             fs.access(__dirname+"/../userDirectory/"+file.path+"/"+file.name, fs.constants.F_OK, function (err, stats) {
               if (err) {
                   return console.error(err);
               }
-              if(file.type=="d"){
-                fs.rmdir(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+              if (file.type == "d") {
+                fs.rmdir(__dirname+"/../userDirectory/" + file.path + "/" + file.name, function(err){
                   if(err) return console.log(err);
                   console.log('Directory deleted successfully!');
                   callback(res, finalResponse);
-              });  
-              }else{
-                fs.unlink(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+                });  
+              } else {
+                fs.unlink(__dirname + "/../userDirectory/" + file.path + "/" + file.name, function(err){
                   if(err) return console.log(err);
                   console.log('file deleted successfully!');
                   callback(res, finalResponse);
@@ -178,7 +178,7 @@ function deleteFile(req,res, callback) { // Receive fileId
       callback(res,finalResponse);
       }
     });
-  }else{ // Check if user is owner and ifso delete all filepermissions and file entries in DB + file in userDirectory
+  } else { // Check if user is owner and ifso delete all filepermissions and file entries in DB + file in userDirectory
     FilePermissions.findOneAndDelete({fileId:req.fileId, userId:userid, delete: true}).exec(function(err, filePerm){
       console.log('Filepermissions deleted successfully!');
       try {

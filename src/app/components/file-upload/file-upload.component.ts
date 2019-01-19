@@ -169,17 +169,15 @@ export class FileUploadComponent implements OnInit {
           this.openSnackBar("Server encountered an error", "Close", "error")
         }
       );  
-    }
-    else if(this.selectedUploadType == "new-folder"){
-      
-      
-      if(this.desiredNewFolderName != ""){
+    } else if(this.selectedUploadType == "new-folder") {
+      if (this.desiredNewFolderName != ""){
         const request = this.fileService.postFolder(formModel).subscribe(
           result => {
             
             if (result.message == "Success") {
               result.files.forEach(element => {
-                if(element.perm.read == true){
+
+                if (element.perm.read == true) {
                   this.listDirectoryComponent.userFolderList.push(File.fromJSON(element.file));
                   this.loading = false;         
                   this.openSnackBar("Folder uploaded with success!", "Close", "success");
@@ -187,7 +185,6 @@ export class FileUploadComponent implements OnInit {
                   this.valid = false;
                 }
               });
-              
   
             } else if(result.message == "Error") {
               this.loading = false;
@@ -195,19 +192,13 @@ export class FileUploadComponent implements OnInit {
               this.clearValidFiles();
               this.openSnackBar("Error while oploading your folder", "Close", "error")
             }
-            
-
           }
         )
-      }else {
-        
-        
+      } else {
         this.openSnackBar("please enter a folder name", "Close", "error");
         this.loading = false;
       }
-        
-    }
-    else if(this.selectedUploadType == "folder-from-computer"){
+    } else if(this.selectedUploadType == "folder-from-computer"){
      
       const request = this.fileService.postFile(formModel).subscribe(
         result => {
@@ -216,13 +207,13 @@ export class FileUploadComponent implements OnInit {
           if (result.message == "Success") {
             result.files.forEach(element => {
               console.log(this.currentPath)
-              if(element.perm.read == true && element.file.type == "f" && this.currentPath == element.file.path){
+              if (element.perm.read == true && element.file.type == "f" && this.currentPath == element.file.path) {
                 this.listDirectoryComponent.userFileList.push(File.fromJSON(element.file));
                 this.loading = false;         
                 this.openSnackBar("All files were uploaded with success!", "Close", "success");
                 this.clearValidFiles();
                 this.valid = false;
-              }else if(element.perm.read == true && element.file.type == "d" && this.currentPath == element.file.path) {
+              } else if(element.perm.read == true && element.file.type == "d" && this.currentPath == element.file.path) {
                 this.listDirectoryComponent.userFolderList.push(File.fromJSON(element.file));
                 this.loading = false;
                 this.openSnackBar("All files were uploaded with success!", "Close", "success");
@@ -230,8 +221,6 @@ export class FileUploadComponent implements OnInit {
                 this.valid = false;
               }
             });
-            
-
           } else if(result.message == "Error") {
             this.loading = false;
             //this.shakeAnimation = 'invalid';
