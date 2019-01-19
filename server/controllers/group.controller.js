@@ -9,7 +9,8 @@ const GroupSchema = Joi.object({
   name: Joi.string().required(),
   fileId: Joi.any().required(),
   userId: Joi.any().required(),
-  status: Joi.boolean().required()
+  status: Joi.boolean().required(),
+  statusGlobal: Joi.boolean().required()
 })
 
 module.exports = {
@@ -25,8 +26,7 @@ module.exports = {
 function displayFileGroup(req,res, callback) {
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
-  let message = "Success"
-  
+  let message = "Success"  
   Group.find({userId:userid}).exec(function(err, fileGroup){
     try {
       if(Object.keys(fileGroup).length !== 0){
@@ -73,16 +73,25 @@ function checkStatusDownloadFile(req,res,callback) {
   var finalResponse = Object.assign({
     'message': "Success"
   });
+  var newvalues = { $set: {statusGlobal: true } };
   Group.find({fileId:req.body.fileId, name:req.body.name}).countDocuments().exec(function(err, nbUser){
+    if(nbUser != 0){
     nbUserNeeded = Math.round(nbUser/2);
     Group.find({fileId:req.body.fileId, name:req.body.name,status: true}).countDocuments().exec(function(err, nbStatusTrue){
       if(nbStatusTrue >= nbUserNeeded){
-        console.log("CA FONCTIONNE")
+        console.log("presque"+req.body.fileId+req.body.name)
+        Group.find({fileId:req.body.fileId, name:req.body.name}).update(newvalues).exec(function(err, statusGlob){
+        console.log("CA FONCTIONNE"+statusGlob)
         callback(res, finalResponse);
+        });
       }else{
         finalResponse.message="Error";
         callback(res,finalResponse);
     }});
+  }else{
+    finalResponse.message="Error";
+        callback(res,finalResponse);
+  }
   });
 }
 
@@ -126,7 +135,8 @@ function generateGroup(req,res,callback) {  //Generate a group name. Create new 
     "fileId" : req.fileId,
     "name" : shortid.generate(),
     "userId" :  userid,
-    "status" : false
+    "status" : false,
+    "statusGlobal" : false
   }).save(); 
 
   newGroup.then(function(result) {
