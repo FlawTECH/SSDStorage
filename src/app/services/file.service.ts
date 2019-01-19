@@ -73,10 +73,18 @@ export class FileService {
     return this.http.get('api/group/displayFileGroup');
   }
 
-  approveShare(fileId: string, groupName: string): Observable<any> {
-    return this.http.post('api/group/checkStatusDownloadFile', {
+  checkDownloadGroupFile(fileId: string, name: string): Observable<any> {
+    return this.http.post('api/group/checkStatusDownloadFile',{
       fileId,
-      groupName
+      name
+    });
+  }
+
+  approveShare(fileId: string, name: string): Observable<any> {
+    console.log(fileId +"&&&&" +name)
+    return this.http.post('api/group/changeStatusGroupFile', {
+      fileId,
+      name
     });
   }
 }

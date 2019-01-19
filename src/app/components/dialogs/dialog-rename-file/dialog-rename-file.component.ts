@@ -16,9 +16,11 @@ export interface DialogData {
 })
 export class DialogRenameFileComponent implements OnInit {
 
+  private inputWidth:any;
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData,public fileService: FileService,public dialogRef: MatDialogRef<DialogRenameFileComponent>) {}
 
   ngOnInit() {
+    this.inputWidth = (this.data.file.name.length * 10)>400?this.data.file.name.length*10:400;
   }
   onNoClick(): void {
     this.dialogRef.close();

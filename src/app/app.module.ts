@@ -26,7 +26,9 @@ import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-fi
 import { MatSnackBarModule, MatDividerModule } from '@angular/material';
 import { FileShareComponent } from './components/file-share/file-share.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
+const config: SocketIoConfig = { url: 'http://localhost:4040', options: {} };
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,6 +45,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    SocketIoModule.forRoot(config),
     HttpClientModule,
     RouterModule,
     SharedModule,
