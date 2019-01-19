@@ -20,13 +20,13 @@
             <tr>
                 <td id="share-list">
                     <mat-list>
-                        <mat-list-item *ngFor="let file of files">
+                        <mat-list-item *ngFor="let file of files; index as i">
                             <div>
                                 {{file.name}}
-                                <mat-icon class="mat-18" *ngIf="!file.status">lock</mat-icon>
-                                <mat-icon class="mat-18" *ngIf="file.status">lock_open</mat-icon>
+                                <mat-icon class="mat-18" *ngIf="!file.statusGlobal">lock</mat-icon>
+                                <mat-icon class="mat-18" *ngIf="file.statusGlobal">lock_open</mat-icon>
                             </div>
-                            <button mat-flat-button color="primary" (click)="approveShare(file.fileId, file.name)">Approve</button>
+                            <button mat-flat-button color="primary" (click)="approveShare(file.fileId, file.name,i)">Approve</button>
                             <mat-divider></mat-divider>
                         </mat-list-item>
                     </mat-list>

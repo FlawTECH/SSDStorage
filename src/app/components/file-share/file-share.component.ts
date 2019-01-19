@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { FileService } from "../../services/file.service";
 import { SocketServiceService } from "../../services/socket-service.service";
+import { Group } from "../../class/group";
 
 @Component({
     selector: 'app-file-share',
@@ -10,20 +11,22 @@ import { SocketServiceService } from "../../services/socket-service.service";
 export class FileShareComponent implements OnInit{
     link: string;
     ioConnection:any;
-    files: Array<Object>
+    files: Array<Group>
     constructor(private fileService: FileService, private socetService: SocketServiceService){}
 
     ngOnInit(): void {
-        this.initIoConnection();
+        console.log('ngoninit');
+        
         this.fileService.getAllSharedFiles().subscribe(res => {
             this.files = res.fileGroup;
             console.log("ngOninit", this.files)
         })
+        this.initIoConnection();
     }
 
     onSubmit(){
         this.fileService.shareFile(window.location.origin + '/api/group/' + this.link).subscribe(res => {
-            console.log(res)
+            
         })
     }
 
@@ -38,9 +41,15 @@ export class FileShareComponent implements OnInit{
       });
     }
 
-    approveShare(fileId: string, groupName: string) {
+    approveShare(fileId: string, groupName: string,index:number) {
         this.fileService.approveShare(fileId, groupName).subscribe(res => {
-            console.log(res)
+            
+            if(res.message =="Success"){
+                this.files[index].status = true;
+                this.files[index].statusGlobal = true;
+                console.log(this.files[index]);
+                
+            }
         });
     }
 }
