@@ -95,7 +95,6 @@ async function insert(req, res) {
   form.parse(req);
 
   form.on('file', function(name, file) {
-    console.log(file)
     incomingFiles.push(file);
   });
 
@@ -270,7 +269,18 @@ async function getFileListByUserId(req, res) {
   let FileModel = mongoose.model('File');
   let FilePermissionsModel = mongoose.model('FilePermissions');
 
+  let path = req.query.path.split('/')
   
+  if (path.length > 2) { // The path is the path of a directory and not a file
+    let path = '';
+    
+    let test = req.query.path.split('/');
+    for (let i = 2; i < test.length; i++) {
+      path += encrypt(test[i]) + '/';
+    }
+    req.query.path = test[0] + '/' + test[1] + '/' + path.slice(0, -1)
+  }
+
   FilePermissionsModel.aggregate([
     {
       "$lookup": {
@@ -289,7 +299,6 @@ async function getFileListByUserId(req, res) {
   ],
   function(err, resp) {
     for (let i = 0; i < resp.length; i++) {
-      console.log(resp[i].file.name)
       resp[i].file.name = decrypt(resp[i].file.name)
     }
     res.send(resp);
