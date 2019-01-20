@@ -205,15 +205,13 @@ async function insert(req, res) {
           let path = '';
 
           for (let i = 0; i < incomingFiles.length; i++) {
-            let test = incomingFiles[i].name.split('/');
-            console.log(incomingFiles[i].name, test)
-            for (let j = 0; j < test.length; j++) {
-              if (j != test.length -1) {
-                path += encrypt(test[j]) + '/';
+            let splittedPath = incomingFiles[i].name.split('/');
+            for (let j = 0; j < splittedPath.length; j++) {
+              if (j != splittedPath.length -1) {
+                path += encrypt(splittedPath[j]) + '/';
               }
             }
-            incomingFiles[i].name  = path + test[test.length - 1]
-            console.log(incomingFiles[i].name)
+            incomingFiles[i].name  = path + splittedPath[splittedPath.length - 1]
             path = ''
           }
 
@@ -274,11 +272,11 @@ async function getFileListByUserId(req, res) {
   if (path.length > 2) { // The path is the path of a directory and not a file
     let path = '';
     
-    let test = req.query.path.split('/');
-    for (let i = 2; i < test.length; i++) {
-      path += encrypt(test[i]) + '/';
+    let splittedPath = req.query.path.split('/');
+    for (let i = 2; i < splittedPath.length; i++) {
+      path += encrypt(splittedPath[i]) + '/';
     }
-    req.query.path = test[0] + '/' + test[1] + '/' + path.slice(0, -1)
+    req.query.path = splittedPath[0] + '/' + splittedPath[1] + '/' + path.slice(0, -1)
   }
 
   FilePermissionsModel.aggregate([
