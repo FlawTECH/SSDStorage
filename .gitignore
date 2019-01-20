@@ -51,4 +51,4 @@ Thumbs.db
 secret\.tmp
 
 package-lock\.json
-/logs
+/logs/logs.txt
