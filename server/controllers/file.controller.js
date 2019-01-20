@@ -84,7 +84,7 @@ function renameFile(req,res,callback) {  // Receive fileId + name
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
   req = req.body;
-  req.name = encrypt(req.name)
+  // req.name = encrypt(req.name)
   var newvalues = { $set: {name: req.name } };
   var finalResponse = Object.assign({
     'message': "Success"
