@@ -23,8 +23,12 @@ import { ListDirectoryComponent } from './components/list-directory/list-directo
 import { WaitingComponent } from './components/waiting/waiting.component';
 import { DialogRenameFileComponent } from './components/dialogs/dialog-rename-file/dialog-rename-file.component';
 import { DialogDeleteFileComponent } from './components/dialogs/dialog-delete-file/dialog-delete-file.component';
-import { MatSnackBarModule } from '@angular/material';
+import { MatSnackBarModule, MatDividerModule } from '@angular/material';
+import { FileShareComponent } from './components/file-share/file-share.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
+const config: SocketIoConfig = { url: 'http://localhost:4040', options: {} };
 @NgModule({
   declarations: [
     AppComponent,
@@ -36,10 +40,12 @@ import { MatSnackBarModule } from '@angular/material';
     WaitingComponent,
     DialogRenameFileComponent,
     DialogDeleteFileComponent,
+    FileShareComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    SocketIoModule.forRoot(config),
     HttpClientModule,
     RouterModule,
     SharedModule,
@@ -48,7 +54,9 @@ import { MatSnackBarModule } from '@angular/material';
     AppRoutingModule,
     MatGridListModule,
     MatRadioModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatDividerModule,
+    MatTooltipModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

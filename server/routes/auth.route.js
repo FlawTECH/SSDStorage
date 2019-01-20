@@ -78,7 +78,7 @@ function checkToken(req, res) {
       if (verified) {
         res.status(200).end()
       } else {
-        res.status(400).json({error: 'Token is not valid'})
+        res.status(400).json({error: 'One time password incorrect'})
       }
     }
   });
@@ -89,8 +89,8 @@ async function login(req, res) {
   const token = authCtrl.generateToken(user);
   const secret = await authCtrl.getOTP(user.fullname);
   var decoded = jwtDecode(token);
-
-  if (!req.body.isRegistered) {
+  
+  if (!req.body.isRegistered && !user.isRegistered) {
     const verified = speakeasy.totp.verify({
       secret: secret,
       encoding: 'base32',
