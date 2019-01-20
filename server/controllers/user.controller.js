@@ -30,7 +30,17 @@ async function insert(user) {
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
   user.secret;
-  return await new User(user).save();
+
+  const nbOfUser = await User.find({});
+
+  if (nbOfUser.length < 1) {
+    user.roles.push('admin');
+    user.status = "Active";
+  }
+  const userDb = await new User(user).save();
+  createDirectory(userDb);
+  initDefaultPermissions(userDb);
+  return userDb;
 }
 
 async function setStatus(user) {
