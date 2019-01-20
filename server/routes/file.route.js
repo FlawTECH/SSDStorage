@@ -42,15 +42,15 @@ router.route('/downloaddir')
 
 router.get('/download', function(req, res){
   console.log(req.query.path);
-  // var file = __dirname + '/../userDirectory' + req.query.path;
+  var file = __dirname + '/../userDirectory' + req.query.path;
   const fileName = req.query.path.split('/')[req.query.path.split('/').length - 1];
   const path = req.query.path.replace(fileName, '');
-  const encryptedFileName = __dirname + '/../userDirectory' + path + encrypt(fileName)
-  fs.renameSync(encryptedFileName, encryptedFileName + '.dat')
-  encryptor.decryptFile(encryptedFileName + '.dat', encryptedFileName, encryptionSecret, function(err){
-    res.download(encryptedFileName, err => {
-      fs.removeSync(encryptedFileName)
-      fs.renameSync(encryptedFileName + '.dat', encryptedFileName)
+  // const encryptedFileName = __dirname + '/../userDirectory' + path + encrypt(fileName)
+  fs.renameSync(file, file + '.dat')
+  encryptor.decryptFile(file + '.dat', file, encryptionSecret, function(err){
+    res.download(file, err => {
+      fs.removeSync(file)
+      fs.renameSync(file + '.dat', file)
     });
   })
 });
@@ -210,18 +210,18 @@ async function insert(req, res) {
             resolveParent(0);
           });
         } else { // Upload files & directories
-          let path = '';
+          // let path = '';
 
-          for (let i = 0; i < incomingFiles.length; i++) {
-            let splittedPath = incomingFiles[i].name.split('/');
-            for (let j = 0; j < splittedPath.length; j++) {
-              if (j != splittedPath.length -1) {
-                path += encrypt(splittedPath[j]) + '/';
-              }
-            }
-            incomingFiles[i].name  = path + splittedPath[splittedPath.length - 1]
-            path = ''
-          }
+          // for (let i = 0; i < incomingFiles.length; i++) {
+          //   let splittedPath = incomingFiles[i].name.split('/');
+          //   for (let j = 0; j < splittedPath.length; j++) {
+          //     if (j != splittedPath.length -1) {
+          //       path += encrypt(splittedPath[j]) + '/';
+          //     }
+          //   }
+          //   incomingFiles[i].name  = path + splittedPath[splittedPath.length - 1]
+          //   path = ''
+          // }
 
           workDone = new Promise(function(resolveParent, rejectParent){
             for(let i=0; i<incomingFiles.length; i++) {
@@ -253,9 +253,9 @@ async function insert(req, res) {
               'files': result,
               'message': message
             });
-            for (let i = 0; i < finalResponse.files.length; i++) {
-              finalResponse.files[i].file.name = decrypt(finalResponse.files[i].file.name)
-            }
+            // for (let i = 0; i < finalResponse.files.length; i++) {
+            //   finalResponse.files[i].file.name = decrypt(finalResponse.files[i].file.name)
+            // }
             res.json(finalResponse);
           });
         });
@@ -277,15 +277,15 @@ async function getFileListByUserId(req, res) {
 
   let path = req.query.path.split('/')
   
-  if (path.length > 2) { // The path is the path of a directory and not a file
-    let path = '';
+  // if (path.length > 2) { // The path is the path of a directory and not a file
+  //   let path = '';
     
-    let splittedPath = req.query.path.split('/');
-    for (let i = 2; i < splittedPath.length; i++) {
-      path += encrypt(splittedPath[i]) + '/';
-    }
-    req.query.path = splittedPath[0] + '/' + splittedPath[1] + '/' + path.slice(0, -1)
-  }
+  //   let splittedPath = req.query.path.split('/');
+  //   for (let i = 2; i < splittedPath.length; i++) {
+  //     path += encrypt(splittedPath[i]) + '/';
+  //   }
+  //   req.query.path = splittedPath[0] + '/' + splittedPath[1] + '/' + path.slice(0, -1)
+  // }
 
   FilePermissionsModel.aggregate([
     {
@@ -304,9 +304,9 @@ async function getFileListByUserId(req, res) {
     ]}}
   ],
   function(err, resp) {
-    for (let i = 0; i < resp.length; i++) {
-      resp[i].file.name = decrypt(resp[i].file.name)
-    }
+    // for (let i = 0; i < resp.length; i++) {
+    //   resp[i].file.name = decrypt(resp[i].file.name)
+    // }
     res.send(resp);
   });
 }
@@ -371,17 +371,17 @@ async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId,
 
 async function createFile(fileName, nestedFilePath, filePath, subdirPath, userId, resolve, reject) { // chiffrer les fichiers
   //Adding perm to DB
-  const encryptedFileName = encrypt(fileName)
+  // const encryptedFileName = encrypt(fileName)
   let fileToUpload = {
     // 'name': fileName,
-    'name': encryptedFileName,
+    'name': fileName,
     'path': "/" + filePath + (subdirPath.length > 0 ? "/" + subdirPath : ""),
     'type': 'f'
   };
 
   //Moving file
   try {
-    fileName = __dirname + "/../userDirectory/" + filePath + "/" + (subdirPath.length > 0 ? subdirPath + "/" : "") + encryptedFileName;
+    fileName = __dirname + "/../userDirectory/" + filePath + "/" + (subdirPath.length > 0 ? subdirPath + "/" : "") + fileName;
     fs.moveSync(nestedFilePath, fileName);
     encryptor.encryptFile(fileName, fileName + '.dat', encryptionSecret, err => {
       fs.removeSync(fileName);
@@ -423,7 +423,6 @@ async function createFileFromZip(file, fileName, filePath, subdirPath, subdirNam
 
   try {
     if (fs.existsSync(filePath + "/" + fileName)) { reject("File already exists"); return; }
-    console.log("encryption")
     encryptor.encryptFile(file, filePath + "/" + fileName + '.dat', encryptionSecret, (err) =>{
       console.log('encryption successful!')
     })

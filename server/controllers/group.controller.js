@@ -47,9 +47,9 @@ function displayFileGroup(req,res, callback) {
 ], function(err, data) {
   try {
     if(Object.keys(data).length !== 0){
-      for(var z = 0; z<data.length; z++) {
-        data[z].info.name = decrypt(data[z].info.name);
-      }
+      // for(var z = 0; z<data.length; z++) {
+      //   data[z].info.name = decrypt(data[z].info.name);
+      // }
       var finalResponse = Object.assign({
         'fileGroup': data,
         'message': message
