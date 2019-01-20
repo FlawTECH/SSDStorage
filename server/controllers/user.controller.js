@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 const fileCtrl = require('../controllers/file.controller');
 const permissionsCtrl = require('../controllers/filePermissions.controller');
 const WrongStatusError = require('../errors').WrongStatusError
-const fs = require('fs');
+const fs = require('fs-extra');
 
 const userSchema = Joi.object({
   fullname: Joi.string().required(),
@@ -84,7 +84,7 @@ function createDirectory(doc) {
   fullname = doc.fullname;
   var dir = __dirname + "/../userDirectory/"+ fullname;
   if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
+    fs.ensureDirSync(dir);
   }
 }
 

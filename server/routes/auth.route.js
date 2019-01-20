@@ -9,6 +9,7 @@ const speakeasy = require('speakeasy');
 const uniqid= require('uniqid');
 const fs = require('fs');
 const readline = require('readline');
+const jwtDecode = require("jwt-decode");
 
 const router = express.Router();
 module.exports = router;
@@ -87,6 +88,7 @@ async function login(req, res) {
   const user = req.user;
   const token = authCtrl.generateToken(user);
   const secret = await authCtrl.getOTP(user.fullname);
+  var decoded = jwtDecode(token);
 
   if (!req.body.isRegistered) {
     const verified = speakeasy.totp.verify({
@@ -94,8 +96,7 @@ async function login(req, res) {
       encoding: 'base32',
       token: req.body.otp
     })
-  
-    if (verified) {
+    if (verified && decoded.status == "Active") {
       res.json({ user, token });
     } else {
       res.status(401).json({error: 'One time password incorrect'})
