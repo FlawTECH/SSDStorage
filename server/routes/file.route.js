@@ -45,11 +45,11 @@ router.route('/downloaddir')
   .post(asyncHandler(download)); */
 
 router.get('/download', function(req, res){
+  console.log(req.query.path);
   // var file = __dirname + '/../userDirectory' + req.query.path;
   const fileName = req.query.path.split('/')[req.query.path.split('/').length - 1];
   const path = req.query.path.replace(fileName, '');
   const encryptedFileName = __dirname + '/../userDirectory' + path + encrypt(fileName)
-
   fs.renameSync(encryptedFileName, encryptedFileName + '.dat')
   encryptor.decryptFile(encryptedFileName + '.dat', encryptedFileName, encryptionSecret, function(err){
     res.download(encryptedFileName, err => {
