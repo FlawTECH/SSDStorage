@@ -15,14 +15,16 @@ const fs = require('fs-extra');
 const jszip = require('jszip');
 const he = require('he');
 const encryptor = require('file-encryptor');
+const encrypt = require('../cryptoUtil').encrypt;
+const decrypt = require('../cryptoUtil').decrypt;
 
 module.exports = router;
+
+const encryptionSecret = '<3Nas-2018';
 
 router.use(passport.authenticate('jwt', {
   session: false
 }))
-
-const encryptionSecret = '<3Nas-2018'
 
 router.route('/')
   .post(asyncHandler(insert));
@@ -41,12 +43,16 @@ router.route('/download')
   .post(asyncHandler(download)); */
 
 router.get('/download', function(req, res){
-  var file = __dirname + '/../userDirectory' + req.query.path;
-  console.log(file)
-  encryptor.decryptFile(file, file + '.dat', encryptionSecret, function(err){
-    console.log(err)
-    res.download(file, err => {
-      fs.removeSync(file + '.dat')
+  // var file = __dirname + '/../userDirectory' + req.query.path;
+  const fileName = req.query.path.split('/')[req.query.path.split('/').length - 1];
+  const path = req.query.path.replace(fileName, '');
+  const encryptedFileName = __dirname + '/../userDirectory' + path + encrypt(fileName)
+
+  fs.renameSync(encryptedFileName, encryptedFileName + '.dat')
+  encryptor.decryptFile(encryptedFileName + '.dat', encryptedFileName, encryptionSecret, function(err){
+    res.download(encryptedFileName, err => {
+      fs.removeSync(encryptedFileName)
+      fs.renameSync(encryptedFileName + '.dat', encryptedFileName)
     });
   })
 });
@@ -55,7 +61,6 @@ async function download(req,res) {
   var file = __dirname + '/../userDirectory/'+req.body.path;
   res.download(file + '.txt');
 }
-
 
 function moveFile(req,res) {
   let moveFile = fileCtrl.moveFile(req);
@@ -90,6 +95,7 @@ async function insert(req, res) {
   form.parse(req);
 
   form.on('file', function(name, file) {
+    console.log(file)
     incomingFiles.push(file);
   });
 
@@ -140,7 +146,7 @@ async function insert(req, res) {
           promises.push(new Promise(function(resolve, reject) {createDirectory(
             filePath,
             filePath.split('/').length,
-            baseDir.split('/').splice(baseDir.split('/').length-1, 1).join('/'),
+            baseDir.split('/').splice(baseDir.split('/').length - 1, 1).join('/'),
             __dirname+"/../userDirectory/"+filePath,
             userId,
             unzipFiles,
@@ -160,7 +166,6 @@ async function insert(req, res) {
                   Object.keys(contents.files).forEach(
                     function(zippedFileName, i) {
                       if(zippedFileName.endsWith('/')) { // Is a directory
-
                         //Fixing filename for creating dirs
                         zippedFileName = zippedFileName.substr(0,zippedFileName.length-1);
                         var destPath = filePath+"/"+uploadedDir+"/"+zippedFileName.split('/').splice(0,zippedFileName.split('/').length-1).join('/');
@@ -198,6 +203,21 @@ async function insert(req, res) {
             resolveParent(0);
           });
         } else { // Upload files & directories
+          let path = '';
+
+          for (let i = 0; i < incomingFiles.length; i++) {
+            let test = incomingFiles[i].name.split('/');
+            console.log(incomingFiles[i].name, test)
+            for (let j = 0; j < test.length; j++) {
+              if (j != test.length -1) {
+                path += encrypt(test[j]) + '/';
+              }
+            }
+            incomingFiles[i].name  = path + test[test.length - 1]
+            console.log(incomingFiles[i].name)
+            path = ''
+          }
+
           workDone = new Promise(function(resolveParent, rejectParent){
             for(let i=0; i<incomingFiles.length; i++) {
 
@@ -228,6 +248,9 @@ async function insert(req, res) {
               'files': result,
               'message': message
             });
+            for (let i = 0; i < finalResponse.files.length; i++) {
+              finalResponse.files[i].file.name = decrypt(finalResponse.files[i].file.name)
+            }
             res.json(finalResponse);
           });
         });
@@ -265,6 +288,10 @@ async function getFileListByUserId(req, res) {
     ]}}
   ],
   function(err, resp) {
+    for (let i = 0; i < resp.length; i++) {
+      console.log(resp[i].file.name)
+      resp[i].file.name = decrypt(resp[i].file.name)
+    }
     res.send(resp);
   });
 }
@@ -277,7 +304,7 @@ async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId,
   }
 
   // Creating dir on file system
-  if(unzipFiles) {
+  if (unzipFiles) {
     dirPath = dirPath.split('/').splice(filePathDepth+1, dirPath.split('/').length-2).join('/');
   }
   else if(dirUpload) {
@@ -322,28 +349,26 @@ async function createDirectory(dirPath, filePathDepth, dirName, baseDir, userId,
         );
       }
     );
-  }
-  catch(err) {
+  } catch(err) {
     reject(err);
   }
 }
 
 async function createFile(fileName, nestedFilePath, filePath, subdirPath, userId, resolve, reject) { // chiffrer les fichiers
-
   //Adding perm to DB
+  const encryptedFileName = encrypt(fileName)
   let fileToUpload = {
-    'name': fileName,
+    // 'name': fileName,
+    'name': encryptedFileName,
     'path': "/" + filePath + (subdirPath.length > 0 ? "/" + subdirPath : ""),
     'type': 'f'
   };
 
   //Moving file
   try {
-    fileName = __dirname + "/../userDirectory/" + filePath + "/" + (subdirPath.length > 0 ? subdirPath + "/" : "") + fileName;
-    // fs.moveSync(nestedFilePath, __dirname+"/../userDirectory/"+filePath+"/"+(subdirPath.length>0?subdirPath+"/":"")+fileName);
+    fileName = __dirname + "/../userDirectory/" + filePath + "/" + (subdirPath.length > 0 ? subdirPath + "/" : "") + encryptedFileName;
     fs.moveSync(nestedFilePath, fileName);
     encryptor.encryptFile(fileName, fileName + '.dat', encryptionSecret, err => {
-      console.log(err || "encryption successfull !!")
       fs.removeSync(fileName);
       fs.renameSync(fileName + '.dat', fileName)
     })
@@ -358,7 +383,6 @@ async function createFile(fileName, nestedFilePath, filePath, subdirPath, userId
     insertedFile => {
       fileToUpload = insertedFile.toObject();
       fileId = fileToUpload._id
-
       permissionToCreate = {
         'fileId': fileId,
         'userId': userId,

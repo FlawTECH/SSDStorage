@@ -23,10 +23,11 @@
                         <mat-list-item *ngFor="let file of files">
                             <div>
                                 {{file.name}}
-                                <mat-icon class="mat-18" *ngIf="!file.status">lock</mat-icon>
-                                <mat-icon class="mat-18" *ngIf="file.status">lock_open</mat-icon>
+                                <mat-icon class="mat-18" *ngIf="!file.statusGlobal">lock</mat-icon>
+                                <mat-icon class="mat-18" *ngIf="file.statusGlobal">lock_open</mat-icon>
                             </div>
                             <button mat-flat-button color="primary" (click)="approveShare(file.fileId, file.name)">Approve</button>
+                            <button mat-flat-button (click)="downloaFile(file, i)">Download</button>
                             <mat-divider></mat-divider>
                         </mat-list-item>
                     </mat-list>

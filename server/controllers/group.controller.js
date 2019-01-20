@@ -29,7 +29,7 @@ function displayFileGroup(req,res, callback) {
   let message = "Success"  
   Group.find({userId:userid}).exec(function(err, fileGroup){
     try {
-      if(Object.keys(fileGroup).length !== 0){
+      if (Object.keys(fileGroup).length !== 0) {
         var finalResponse = Object.assign({
           'fileGroup': fileGroup,
           'message': message
