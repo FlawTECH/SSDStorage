@@ -1,8 +1,10 @@
 const Joi = require('joi');
 const Group = require('../models/group.model');
+const File = require('../models/file.model');
 const jwtDecode = require("jwt-decode");
 const shortid = require('shortid');
 const serverInstance = require("../index");
+const mongoose = require('mongoose');
 
 
 const GroupSchema = Joi.object({
@@ -22,29 +24,44 @@ module.exports = {
   displayFileGroup
 }
 
-// POST localhost:4040/api/displayFileGroup  
+// GET localhost:4040/api/group/displayFileGroup   
 function displayFileGroup(req,res, callback) {
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
-  let message = "Success"  
-  Group.find({userId:userid}).exec(function(err, fileGroup){
-    try {
-      if (Object.keys(fileGroup).length !== 0) {
-        var finalResponse = Object.assign({
-          'fileGroup': fileGroup,
-          'message': message
-        });
-        callback(res, finalResponse);
-      }
-    } catch (error) {
+  let message = "Success" ;
+  let FileModel = mongoose.model('File');
+  let GroupModel = mongoose.model('Group');
+
+  GroupModel.aggregate([{
+    $lookup: {
+        from: FileModel.collection.name, // collection name in db
+        localField: "fileId",
+        foreignField: "_id",
+        as: "info"
+    }
+},
+{ "$unwind": "$info" },
+{ "$match": { "$and": [
+  { "userId": new mongoose.Types.ObjectId(userid) }
+]}}
+], function(err, data) {
+  try {
+    if(Object.keys(data).length !== 0){
+      
       var finalResponse = Object.assign({
+        'fileGroup': data,
         'message': message
       });
-      finalResponse.message="Error";
-      callback(res,finalResponse);
-    }   
-  });
-
+      callback(res, finalResponse);
+    }
+  } catch (error) {
+    var finalResponse = Object.assign({
+      'message': message
+    });
+    finalResponse.message="Error";
+    callback(res,finalResponse);
+  }  
+});
 }
 
 // POST localhost:4040/api/changeStatusGroupFile with fileId and name of the group
@@ -107,7 +124,9 @@ function joinGroup(req,res,callback) { //need the req.params.groupName that is t
   Group.findOne({name:req.params.groupName}).exec(function(err, group){
     try {
       if(Object.keys(group).length !== 0){
-        var newGroup =  new Group({
+        Group.find({userId:userid, name: req.params.groupName}).countDocuments().exec(function(err, nbUser){
+          if(nbUser == 0){
+          var newGroup =  new Group({
           "fileId" : group.fileId,
           "name" : req.params.groupName,
           "userId" :  userid,
@@ -116,7 +135,14 @@ function joinGroup(req,res,callback) { //need the req.params.groupName that is t
         newGroup.then(function(result) {
           callback(res, finalResponse);
         })
+          }
+        else{
+        console.log("Error: " +userid +" is already in group " +req.params.groupName)
+        finalResponse.message="Error: Already in the group";
+        callback(res,finalResponse);
         }
+        });
+      }
     } catch (error) {
       finalResponse.message="Error";
       callback(res,finalResponse);

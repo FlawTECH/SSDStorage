@@ -1,37 +1,39 @@
 <div id="container">
-        <table>
-            <tr>
-                <td id="share">
-                    <mat-card>
-                        <mat-card-header>
-                            File-share
-                        </mat-card-header>
-                        <mat-card-content>
-                            <form (ngSubmit)="onSubmit()">
-                                <mat-form-field>
-                                    <input matInput placeholder="Link" name="link" required [(ngModel)]="link"/>
-                                </mat-form-field>
-                                <button mat-raised-button color="primary" type="submit">Join</button>
-                            </form>
-                        </mat-card-content>
-                    </mat-card>
-                </td>
-            </tr>
-            <tr>
-                <td id="share-list">
-                    <mat-list>
-                        <mat-list-item *ngFor="let file of files">
-                            <div>
-                                {{file.name}}
-                                <mat-icon class="mat-18" *ngIf="!file.statusGlobal">lock</mat-icon>
-                                <mat-icon class="mat-18" *ngIf="file.statusGlobal">lock_open</mat-icon>
-                            </div>
-                            <button mat-flat-button color="primary" (click)="approveShare(file.fileId, file.name)">Approve</button>
-                            <button mat-flat-button (click)="downloaFile(file, i)">Download</button>
-                            <mat-divider></mat-divider>
-                        </mat-list-item>
-                    </mat-list>
-                </td>
-            </tr>
-        </table>
+  <table>
+    <tr>
+      <td id="share">
+        <mat-card>
+          <mat-card-header>
+            File-share
+          </mat-card-header>
+          <mat-card-content>
+            <form (ngSubmit)="onSubmit()">
+              <mat-form-field>
+                <input matInput placeholder="Link" name="link" required [(ngModel)]="link" />
+              </mat-form-field>
+              <button mat-raised-button color="primary" type="submit">Join</button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </td>
+    </tr>
+    <tr>
+      <td id="share-list">
+        <mat-list>
+          <mat-list-item *ngFor="let file of fileGroup; index as i">
+            <div>
+              {{file.name}}
+              <mat-icon class="mat-18" *ngIf="!file.statusGlobal">lock</mat-icon>
+              <mat-icon class="mat-18" *ngIf="file.statusGlobal">lock_open</mat-icon>
+              <button mat-icon-button *ngIf="file.statusGlobal" (click)="downloadFile(file.info.path+'/',file.info.name)" color="primary">
+                <mat-icon class="mat-18">cloud_download</mat-icon>
+              </button>
+            </div>
+            <button mat-flat-button color="primary" (click)="approveShare(file.fileId, file.name,i)">Approve</button>
+            <mat-divider></mat-divider>
+          </mat-list-item>
+        </mat-list>
+      </td>
+    </tr>
+  </table>
 </div>
