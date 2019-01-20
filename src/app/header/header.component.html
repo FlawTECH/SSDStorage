@@ -10,7 +10,7 @@
         <mat-icon>account_circle</mat-icon>{{user.fullname}}
       </a>
       <mat-menu #menu="matMenu">
-        <button mat-menu-item *ngIf="user && user.isAdmin" [routerLink]="['/admin']">admin</button>
+        <!-- <button mat-menu-item *ngIf="user && user.isAdmin" [routerLink]="['/admin']">admin</button> -->
         <button mat-menu-item (click)="logout()">logout</button>
       </mat-menu>
     </div>

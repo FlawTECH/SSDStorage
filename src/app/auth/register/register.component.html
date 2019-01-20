@@ -16,8 +16,13 @@
           <td>
             <mat-form-field>
               <input matInput placeholder="Password" formControlName="password" type="password" name="password" required>
-              <mat-error *ngIf="password.invalid">Password must be 10 letters long</mat-error>
+              <mat-error *ngIf="password.invalid">Password must contain 10 uppercase/lowercase letters, 1 special caracter and a number</mat-error>
             </mat-form-field>
+          </td>
+          <td>
+            <button mat-button  matTooltip="Info about the action">
+              <mat-icon aria-label="info password">info</mat-icon>
+            </button>
           </td>
         </tr>
         <tr>

@@ -19,7 +19,11 @@ const GroupSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
     default: false
-  },
+  },statusGlobal: {
+    type: Boolean,
+    required: true,
+    default: false
+  }
 });
 
 module.exports = mongoose.model('Group', GroupSchema);

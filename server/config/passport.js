@@ -29,6 +29,7 @@ const jwtLogin = new JwtStrategy({
     return done(null, false);
   }
   user = user.toObject();
+  user.isRegistered = true;
   delete user.hashedPassword;
   done(null, user);
 });

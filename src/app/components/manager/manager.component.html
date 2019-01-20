@@ -1,11 +1,24 @@
 <div class="transitionFade">
-  <div class="nav-bar">
+  <div class="nav-bar" *ngIf="!isAdmin;else adminSection">
     <nav mat-tab-nav-bar aria-label="management">
-      <a mat-tab-link *ngFor="let tab of tabs" [routerLink]="[tab.path]" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+
+      <a mat-tab-link *ngFor="let tab of userTabs" [routerLink]="[tab.path]" routerLinkActive #rla="routerLinkActive"
+        [active]="rla.isActive">
         {{tab.label}}
       </a>
+
     </nav>
   </div>
+  <ng-template #adminSection>
+    <nav mat-tab-nav-bar aria-label="management">
+
+      <a mat-tab-link *ngFor="let tab of adminTabs" [routerLink]="[tab.path]" routerLinkActive #rla="routerLinkActive"
+        [active]="rla.isActive">
+        {{tab.label}}
+      </a>
+
+    </nav>
+  </ng-template>
 
   <router-outlet></router-outlet>
 </div>

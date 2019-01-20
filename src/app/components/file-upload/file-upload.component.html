@@ -22,7 +22,7 @@
   <form #formFile="ngForm" (ngSubmit)="onSubmit()">
     <mat-card-content>
 
-      <mat-grid-list cols="2" rowHeight="50" [gutterSize]="'1px'">
+      <mat-grid-list [@grow]="{value: gridState, params:{grid_size: gridSize}}" cols="2" rowHeight="fit" [gutterSize]="'1px'">
 
 
         <mat-grid-tile [colspan]="1" [rowspan]="">

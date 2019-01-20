@@ -16,7 +16,8 @@ import { DialogDeleteFileComponent } from '../dialogs/dialog-delete-file/dialog-
 export class ListDirectoryComponent implements OnInit, OnChanges {
   public userFileList: File[] = [];
   public userFolderList : File[] = [];
-  
+  private dialogWidth: any;
+
   public token = jwtDecode(localStorage.getItem("AuthToken"));
 
   @Input()
@@ -31,27 +32,22 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
   generateGroup(file: File) {
     console.log(window.location.origin)
     this.fileService.generateGroup(file.id).subscribe(res => {
-      this.snackBar.open(window.location.origin + '/api/group/generate' + res.name, 'Close', {
-        duration : 5000
-      })
+      this.snackBar.open("Copy this string: " + res.name, 'Close')
     });
   }
   
   ngOnInit() {
     this.fileService.getFile("/"+this.token.fullname).subscribe(
       (res) =>{
-        //console.log(res);
-        if(res){
+        if (res) {
           res.forEach(element => {
             
             if (element.file.type === "f" && element.read == true) {
-              
               this.userFileList.push(File.fromJSON(element.file));
             } else if (element.file.type == "d" && element.read == true ){
               this.userFolderList.push(File.fromJSON(element.file));
             }
           });
-          //console.log(this.userFileList[0])
         }
       }
     )
@@ -76,7 +72,7 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
           this.userFolderList.push(new File("..",previous))
           result.forEach(element => {
             
-            if(element.file.type ==="f" && element.read == true){
+            if (element.file.type === "f" && element.read == true) {
               
               this.userFileList.push(File.fromJSON(element.file));
             } else if (element.file.type == "d" && element.read == true ) {
@@ -118,9 +114,8 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
     }
   }
 
-  downloadFile(path:any,name:any){
+  downloadFile(path: any, name: any){
     let pathh = path + name;
-    
     //window.location.href='http://localhost:4040/api/file/download?path=/zeyd/download.jpg';
     this.fileService.donwloadFile(pathh).subscribe(data => saveAs(data, name)
     ); 
@@ -134,10 +129,9 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
   }
 
   openDialog(file:File,index:number){
-    console.log(file);
-    
+    this.dialogWidth = (file.name.length * 11) > 400 ? file.name.length * 11 : 400;
     const dialogRef = this.dialog.open(DialogRenameFileComponent, {
-      width: '250px',
+      width: this.dialogWidth + "px",
       data: {
         file: file,
         index:index,
@@ -147,14 +141,11 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      //console.log(result);
-      
-      //this.fileService.renameFile(result.)
     });
   }
 
   deleteFile(file:File,index:number){
-    const dialogRef = this.dialog.open(DialogDeleteFileComponent,{
+    const dialogRef = this.dialog.open(DialogDeleteFileComponent, {
       width: '500px',
       data:{
         file:file,
@@ -162,9 +153,9 @@ export class ListDirectoryComponent implements OnInit, OnChanges {
         userFileList : this.userFileList
       }
     });
+    
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-
     });
   }
 

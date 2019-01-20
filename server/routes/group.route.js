@@ -17,7 +17,7 @@ router.route('/checkStatusDownloadFile')
 router.route('/changeStatusGroupFile')
   .post(asyncHandler(changeStatusGroupFile));
 router.route('/displayFileGroup')
-  .post(asyncHandler(displayFileGroup));
+  .get(asyncHandler(displayFileGroup));
 
 router.get('/:groupName', function(req, res){
     asyncHandler(joinGroup(req,res));

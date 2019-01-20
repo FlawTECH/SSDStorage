@@ -1,0 +1,19 @@
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    
+    table {
+        width: 100%;
+
+        #share {
+            display: flex;
+            justify-content: center;
+        }
+
+        button {
+            margin-left: 10px;
+        }
+    }
+}

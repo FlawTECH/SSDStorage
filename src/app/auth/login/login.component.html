@@ -33,4 +33,8 @@
     <button mat-raised-button (click)="login()" color="primary">Login</button>
     <span>Don't have an account ? <a [routerLink]="['/auth/2fa']" >register</a> here</span>
   </mat-card-actions>
+
+  <mat-card-footer>
+      <mat-progress-bar *ngIf="loading" class="progress-bar" mode="query"></mat-progress-bar>
+    </mat-card-footer>
 </mat-card>

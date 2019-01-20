@@ -8,7 +8,8 @@ const fs = require('fs-extra');
 const jszip = require('jszip');
 const tmp = require('tmp');
 const os = require('os');
-
+const encrypt = require('../cryptoUtil').encrypt;
+const decrypt = require('../cryptoUtil').decrypt;
 
 const FileSchema = Joi.object({
   name: Joi.string().required(),
@@ -24,15 +25,14 @@ module.exports = {
   downloadDir
 }
 
-
 function moveFile(req,res,callback) {  // Receive FileObject with new path
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
   req = req.body;
   var newvalues = { $set: {path: req.path } };
-  if(decoded.roles.indexOf('admin') == 0) { // Check if user is admin and ifso change file's path in DB + move file
+  if (decoded.roles.indexOf('admin') == 0) { // Check if user is admin and ifso change file's path in DB + move file
     File.findByIdAndUpdate(req._id, newvalues,  function(err,file) {
-      if(err) throw err;
+      if (err) throw err;
       fs.stat(__dirname+"/../userDirectory/"+file.path+"/"+file.name, function (err, stats) {
         if (err) {
             return console.error(err);
@@ -43,7 +43,7 @@ function moveFile(req,res,callback) {  // Receive FileObject with new path
         })
       });
     }); 
-  }else{
+  } else {
     FilePermissions.findOne({fileId:req._id, userId:userid, write: true}).exec(function(err, filePerm){
       // TODO : TRY CATCH autour de cet objet.keys sinon crash de l'app si on change une valeur de req.body._id
       if(Object.keys(filePerm).length !== 0){ // If FilePermissions.query return something
@@ -51,10 +51,10 @@ function moveFile(req,res,callback) {  // Receive FileObject with new path
           req.path = req.path.slice(0,-1);
         }
         lastDirectory = req.path.split("/");
-        if(lastDirectory != decoded.fullname){
+        if (lastDirectory != decoded.fullname){
           lastDirectory = lastDirectory[lastDirectory.length-1];
           pathLastDirectory = req.path.slice(0,-lastDirectory.length-1);
-        }else{
+        } else { 
           pathLastDirectory = "/";
         }
         File.findOne({name:lastDirectory, path:pathLastDirectory}).exec(function(err, fileInfo){
@@ -74,24 +74,20 @@ function moveFile(req,res,callback) {  // Receive FileObject with new path
                     })
                   });
                 }); 
-    
               }    
             });
-
           }
         });
-        
       }
     });
-
   }
-
 }
 
 function renameFile(req,res,callback) {  // Receive fileId + name
   var decoded = jwtDecode(req.headers.authorization.split(' ')[1]);
   var userid = decoded._id;
   req = req.body;
+  req.name = encrypt(req.name)
   var newvalues = { $set: {name: req.name } };
   var finalResponse = Object.assign({
     'message': "Success"
@@ -149,26 +145,26 @@ function deleteFile(req,res, callback) { // Receive fileId
   var finalResponse = Object.assign({
     'message': "Success"
   });
-  if(decoded.roles.indexOf('admin') == 0) { // Check if user is admin and ifso delete all filepermissions and file entries in DB + file in userDirectory
+  if (decoded.roles.indexOf('admin') == 0) { // Check if user is admin and ifso delete all filepermissions and file entries in DB + file in userDirectory
     FilePermissions.find({fileId:req.fileId}).remove().exec(function(err, filePerm){
       console.log('Filepermissions deleted successfully!');
       try {
-        if(Object.keys(filePerm).length !== 0){
-          File.findByIdAndDelete(req.fileId, function(err,file) {
-            if(err) throw err;
-            console.log('File with Id: '+req.fileId +' deleted in the database!')
+        if (Object.keys(filePerm).length !== 0) {
+          File.findByIdAndDelete(req.fileId, function(err, file) {
+            if (err) throw err;
+            console.log('File with Id: ' + req.fileId + ' deleted in the database!')
             fs.access(__dirname+"/../userDirectory/"+file.path+"/"+file.name, fs.constants.F_OK, function (err, stats) {
               if (err) {
                   return console.error(err);
               }
-              if(file.type=="d"){
-                fs.rmdir(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+              if (file.type == "d") {
+                fs.rmdir(__dirname+"/../userDirectory/" + file.path + "/" + file.name, function(err){
                   if(err) return console.log(err);
                   console.log('Directory deleted successfully!');
                   callback(res, finalResponse);
-              });  
-              }else{
-                fs.unlink(__dirname+"/../userDirectory/"+file.path+"/"+file.name,function(err){
+                });  
+              } else {
+                fs.unlink(__dirname + "/../userDirectory/" + file.path + "/" + file.name, function(err){
                   if(err) return console.log(err);
                   console.log('file deleted successfully!');
                   callback(res, finalResponse);
@@ -182,7 +178,7 @@ function deleteFile(req,res, callback) { // Receive fileId
       callback(res,finalResponse);
       }
     });
-  }else{ // Check if user is owner and ifso delete all filepermissions and file entries in DB + file in userDirectory
+  } else { // Check if user is owner and ifso delete all filepermissions and file entries in DB + file in userDirectory
     FilePermissions.findOneAndDelete({fileId:req.fileId, userId:userid, delete: true}).exec(function(err, filePerm){
       console.log('Filepermissions deleted successfully!');
       try {

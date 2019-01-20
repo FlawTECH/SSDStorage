@@ -9,7 +9,6 @@ import { saveAs } from 'file-saver';
 })
 export class FileService {
   private linkApi = '/api/file';
-  private linkApi2 = '/api/group';
   private token;
 
   constructor(private http: HttpClient) {
@@ -31,9 +30,9 @@ export class FileService {
 
    //POST a file
   postFile(formData: FormData): Observable<any> {
-  return this.http.post(this.linkApi, formData, {
-    //params: new HttpParams().set('path', path.toString())
-  });
+    return this.http.post(this.linkApi, formData, {
+      //params: new HttpParams().set('path', path.toString())
+    });
   }
 
   //POST a folder
@@ -74,6 +73,29 @@ export class FileService {
   deleteFile(fileId:String):Observable<any> {
     return this.http.put(this.linkApi+"/delete",{
       "fileId": fileId
+    });
+  }
+
+  shareFile(link: string): Observable<any> {
+    return this.http.get(link);
+  }
+
+  getAllSharedFiles(): Observable<any> {
+    return this.http.get('api/group/displayFileGroup');
+  }
+
+  checkDownloadGroupFile(fileId: string, name: string): Observable<any> {
+    return this.http.post('api/group/checkStatusDownloadFile',{
+      fileId,
+      name
+    });
+  }
+
+  approveShare(fileId: string, name: string): Observable<any> {
+    console.log(fileId +"&&&&" +name)
+    return this.http.post('api/group/changeStatusGroupFile', {
+      fileId,
+      name
     });
   }
 }
