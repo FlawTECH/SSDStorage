@@ -97,6 +97,8 @@ async function login(req, res) {
       token: req.body.otp
     })
     if (verified && decoded.status == "Active") {
+      fs.appendFile(__dirname + "/../logs/logs.txt","\n" +new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '') +" : User log in: " +decoded.fullname, function(err) {
+      })
       res.json({ user, token });
     } else {
       res.status(401).json({error: 'One time password incorrect'})
