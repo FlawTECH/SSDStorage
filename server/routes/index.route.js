@@ -6,8 +6,16 @@ const fileGroupRoutes = require('./fileGroup.route');
 const filePermissionsRoutes = require('./filePermissions.route');
 const groupRoutes = require('./group.route');
 const userGroupRoutes = require('./userGroup.route');
+const rateLimit = require("express-rate-limit");
 
-const router = express.Router(); // eslint-disable-line new-cap
+const router = express.Router(); 
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,  
+  max: 30 
+});
+
+router.use(limiter);
 
 /** GET /health-check - Check service health */
 router.get('/health-check', (req, res) =>
