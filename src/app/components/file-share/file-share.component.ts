@@ -47,10 +47,11 @@ export class FileShareComponent implements OnInit{
         this.fileService.approveShare(fileId, groupName).subscribe(res => {
             
             if(res.message =="Success"){
-                this.fileGroup[index].status = true;
-                this.fileGroup[index].statusGlobal = true;
+                this.ngOnInit();
                 console.log(this.fileGroup[index]);
                 
+            }else(res.message =="Error"){
+                 
             }
         });
     }
