@@ -107,7 +107,9 @@ function joinGroup(req,res,callback) { //need the req.params.groupName that is t
   Group.findOne({name:req.params.groupName}).exec(function(err, group){
     try {
       if(Object.keys(group).length !== 0){
-        var newGroup =  new Group({
+        Group.find({userId:userid, name: req.params.groupName}).countDocuments().exec(function(err, nbUser){
+          if(nbUser == 0){
+          var newGroup =  new Group({
           "fileId" : group.fileId,
           "name" : req.params.groupName,
           "userId" :  userid,
@@ -116,7 +118,14 @@ function joinGroup(req,res,callback) { //need the req.params.groupName that is t
         newGroup.then(function(result) {
           callback(res, finalResponse);
         })
+          }
+        else{
+        console.log("Error: " +userid +" is already in group " +req.params.groupName)
+        finalResponse.message="Error: Already in the group";
+        callback(res,finalResponse);
         }
+        });
+      }
     } catch (error) {
       finalResponse.message="Error";
       callback(res,finalResponse);
