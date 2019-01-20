@@ -3,7 +3,6 @@ const asyncHandler = require('express-async-handler')
 const passport = require('passport');
 const userCtrl = require('../controllers/user.controller');
 const authCtrl = require('../controllers/auth.controller');
-const config = require('../config/config');
 const qrcode = require('qrcode');
 const speakeasy = require('speakeasy');
 const fs = require('fs');
