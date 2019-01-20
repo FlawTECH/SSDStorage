@@ -37,7 +37,6 @@ export class FileShareComponent implements OnInit{
       .subscribe((message: any) => {
           if(message)  {
               this.fileService.checkDownloadGroupFile(message.fileId,message.name).subscribe(res => {
-                  console.log(res)
               })
           }
       });
@@ -47,11 +46,7 @@ export class FileShareComponent implements OnInit{
         this.fileService.approveShare(fileId, groupName).subscribe(res => {
             
             if(res.message =="Success"){
-                this.ngOnInit();
-                console.log(this.fileGroup[index]);
-                
-            }else(res.message =="Error"){
-                 
+                location.reload();                
             }
         });
     }
