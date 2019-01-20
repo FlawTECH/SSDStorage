@@ -2,14 +2,12 @@ const Joi = require('joi');
 const File = require('../models/file.model');
 const FilePermissions = require('../models/filePermissions.model');
 const jwtDecode = require("jwt-decode");
-const User = require('../models/user.model');
 const mongoose = require('mongoose');
 const fs = require('fs-extra');
 const jszip = require('jszip');
 const tmp = require('tmp');
 const os = require('os');
 const encrypt = require('../cryptoUtil').encrypt;
-const decrypt = require('../cryptoUtil').decrypt;
 
 const FileSchema = Joi.object({
   name: Joi.string().required(),
@@ -45,7 +43,6 @@ function moveFile(req,res,callback) {  // Receive FileObject with new path
     }); 
   } else {
     FilePermissions.findOne({fileId:req._id, userId:userid, write: true}).exec(function(err, filePerm){
-      // TODO : TRY CATCH autour de cet objet.keys sinon crash de l'app si on change une valeur de req.body._id
       if(Object.keys(filePerm).length !== 0){ // If FilePermissions.query return something
         if(req.path.slice(-1) == "/"){
           req.path = req.path.slice(0,-1);
@@ -284,7 +281,6 @@ function generateZipFromFiles(files, fromDir) {
         }
       }
     }
-
     var tmpDir = tmp.dirSync(os.tmpdir());
     fs.ensureDirSync(tmpDir.name+"/"+fromDir.split('/').splice(0, fromDir.split('/').length-1).join('/'));
 

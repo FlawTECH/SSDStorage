@@ -1,11 +1,9 @@
 const Joi = require('joi');
 const Group = require('../models/group.model');
-const File = require('../models/file.model');
 const jwtDecode = require("jwt-decode");
 const shortid = require('shortid');
 const serverInstance = require("../index");
 const mongoose = require('mongoose');
-const encrypt = require('../cryptoUtil').encrypt;
 const decrypt = require('../cryptoUtil').decrypt;
 
 
