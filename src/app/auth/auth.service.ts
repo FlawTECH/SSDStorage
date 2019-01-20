@@ -38,8 +38,8 @@ export class AuthService {
   }
 
   register(fullname : string,  password : string, repeatPassword : string, status: string = "Waiting") : Observable <any> {
-    const tmpId = (<any>window).tmpId;
     const otp = (<any>window).otp;
+    const secret = (<any>window).secret;
     const roles = []
     return Observable.create(observer => {
       this.http.post('/api/auth/register', {
@@ -47,9 +47,9 @@ export class AuthService {
         status,
         password,
         roles,
-        tmpId,
         repeatPassword,
-        otp
+        otp,
+        secret
       }).subscribe((data : any) => {
         observer.next({user: data.user});
         this.setUser(data.user);
@@ -87,17 +87,17 @@ export class AuthService {
   getQrCode(): Observable<any> {
     return Observable.create(observer => {
       this.http.get('/api/auth/qrcode').subscribe((data: any) => {
-        observer.next({tmpId: data.id, qrcode: data.qrcode_uri});
-        (<any>window).tmpId = data.id;
+        observer.next({qrcode: data.qrcode_uri});
+        (<any>window).secret = data.secret
         observer.complete()
       })
     })
   }
 
-  checkToken(token: string, id: string): Observable<any> {
+  checkToken(token: string, secret: string): Observable<any> {
     (<any>window).otp = token;
     return Observable.create(observer => {
-      this.http.post('/api/auth/token', {token, id}).subscribe((data: any) => {
+      this.http.post('/api/auth/token', {token, secret}).subscribe((data: any) => {
         observer.next(data);
         observer.complete();
       })
